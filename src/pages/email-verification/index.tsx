@@ -1,45 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { AuthLayout } from '../components/auth/AuthLayout';
-import { Button } from '../components/ui/button';
-import { Alert, AlertDescription } from '../components/ui/alert';
+import { Link } from 'react-router-dom';
+import { AuthLayout } from '../../components/auth/AuthLayout';
+import { Button } from '../../components/ui/button';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { useEmailVerification } from '../../hooks/email-verification/useEmailVerification';
+
 export function EmailVerificationPage() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading'
-  );
-  useEffect(() => {
-    // Simulate API call to verify token
-    const verifyToken = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      if (!token || token === 'expired') {
-        setStatus('error');
-      } else {
-        setStatus('success');
-      }
-    };
-    verifyToken();
-  }, [token]);
+  const { status, isResending, handleResendEmail } = useEmailVerification();
+
   return (
     <AuthLayout
       title="Xác thực Email"
       subtitle="Đang kiểm tra thông tin xác thực của bạn..."
-      imageSrc="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000&auto=format&fit=crop">
-      
+      imageSrc="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000&auto=format&fit=crop"
+    >
       <div className="mt-8">
-        {status === 'loading' &&
-        <div className="flex flex-col items-center justify-center py-8 text-center">
+        {status === 'loading' && (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">
               Đang xác thực email của bạn...
             </p>
           </div>
-        }
+        )}
 
-        {status === 'success' &&
-        <div className="grid gap-6">
+        {status === 'success' && (
+          <div className="grid gap-6">
             <Alert className="border-green-500 bg-green-50 dark:bg-green-950/50">
               <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               <AlertDescription className="text-green-800 dark:text-green-200 ml-2 text-base">
@@ -51,23 +37,30 @@ export function EmailVerificationPage() {
               <Link to="/login">Đăng nhập ngay</Link>
             </Button>
           </div>
-        }
+        )}
 
-        {status === 'error' &&
-        <div className="grid gap-6">
+        {status === 'error' && (
+          <div className="grid gap-6">
             <Alert variant="destructive">
               <XCircle className="h-5 w-5" />
               <AlertDescription className="ml-2 text-base">
                 Liên kết xác thực đã hết hạn hoặc không hợp lệ.
               </AlertDescription>
             </Alert>
-            <Button className="w-full">Gửi lại email xác thực</Button>
+            <Button
+              className="w-full"
+              onClick={handleResendEmail}
+              disabled={isResending}
+            >
+              {isResending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Gửi lại email xác thực
+            </Button>
             <Button asChild variant="outline" className="w-full">
               <Link to="/login">Quay lại đăng nhập</Link>
             </Button>
           </div>
-        }
+        )}
       </div>
-    </AuthLayout>);
-
+    </AuthLayout>
+  );
 }
