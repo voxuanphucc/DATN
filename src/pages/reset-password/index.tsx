@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useResetPassword } from '../../hooks/reset-password/useResetPassword';
 
 export function ResetPasswordPage() {
+  const navigate = useNavigate();
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -30,8 +31,8 @@ export function ResetPasswordPage() {
               Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.
             </AlertDescription>
           </Alert>
-          <Button asChild className="w-full">
-            <Link to="/forgot-password">Yêu cầu liên kết mới</Link>
+          <Button onClick={() => navigate('/forgot-password')} className="w-full">
+            Yêu cầu liên kết mới
           </Button>
         </div>
       ) : isSuccess ? (

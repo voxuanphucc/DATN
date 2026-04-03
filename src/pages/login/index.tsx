@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { useLogin } from '../../hooks/login/useLogin';
 
 export function LoginPage() {
+  const navigate = useNavigate();
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -51,12 +52,13 @@ export function LoginPage() {
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Mật khẩu</Label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-medium text-primary hover:underline"
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  className="text-sm font-medium text-primary hover:underline cursor-pointer"
                 >
                   Quên mật khẩu?
-                </Link>
+                </button>
               </div>
               <Input
                 id="password"
@@ -83,9 +85,12 @@ export function LoginPage() {
 
         <div className="text-center text-sm">
           Chưa có tài khoản?{' '}
-          <Link to="/register" className="font-medium text-primary hover:underline">
+          <button
+            onClick={() => navigate('/register')}
+            className="font-medium text-primary hover:underline cursor-pointer"
+          >
             Đăng ký ngay
-          </Link>
+          </button>
         </div>
       </div>
     </AuthLayout>

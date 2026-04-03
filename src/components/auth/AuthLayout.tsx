@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -13,21 +13,23 @@ export function AuthLayout({
   subtitle,
 
 }: AuthLayoutProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="h-screen w-full flex bg-background overflow-hidden">
       {/* Left side - Form */}
       <div className="flex-1 flex flex-col justify-center overflow-y-auto px-4 sm:px-6 lg:flex-none lg:w-[500px] xl:w-[600px] lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="mb-5">
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity cursor-pointer">
               
               <Leaf className="h-8 w-8" />
               <span className="text-2xl font-bold tracking-tight">
                 FarmerAI
               </span>
-            </Link>
+            </button>
             <h2 className="mt-5 text-3xl font-bold tracking-tight text-foreground">
               {title}
             </h2>
@@ -57,6 +59,6 @@ export function AuthLayout({
           </p>
         </div>
       </div>
-    </div>);
-
+    </div>
+  );
 }

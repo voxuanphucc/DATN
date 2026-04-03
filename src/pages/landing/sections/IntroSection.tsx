@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowUpRightIcon, LeafIcon, BarChart2Icon } from "lucide-react";
 import { useReveal } from "@/components/hooks/useReveal";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import CornIntro from "@/assets/Corn-intro.png";
 interface IntroSectionProps {}
 
 const IntroSection = forwardRef<HTMLDivElement, IntroSectionProps>((_, ref) => {
+  const navigate = useNavigate();
   const { ref: revealRef, visible } = useReveal();
 
   return (
@@ -37,7 +39,7 @@ const IntroSection = forwardRef<HTMLDivElement, IntroSectionProps>((_, ref) => {
           <Button
             variant="cta-yellow"
             size="md"
-            onClick={() => (window.location.href = "#")}
+            onClick={() => navigate("/dashboard")}
           >
             Tạo mùa vụ ngay <ArrowUpRightIcon className="w-5 h-5" />
           </Button>

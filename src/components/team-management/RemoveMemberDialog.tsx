@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../ui/alert-dialog'
+import { Button } from '../ui/button'
 import { Member, Task } from '../../types/team'
 import { toast } from 'sonner'
 import { AlertTriangle } from 'lucide-react'
@@ -77,11 +78,10 @@ export function RemoveMemberDialog({
 
         <AlertDialogFooter>
           <AlertDialogCancel>Hủy</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            Xóa khỏi trang trại
+          <AlertDialogAction onClick={handleConfirm}>
+            <Button className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Xóa khỏi trang trại
+            </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

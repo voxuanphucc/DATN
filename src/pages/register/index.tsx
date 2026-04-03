@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useRegister } from '../../hooks/register/useRegister';
 
 export function RegisterPage() {
+  const navigate = useNavigate();
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -28,8 +29,8 @@ export function RegisterPage() {
             Đăng ký thành công! Vui lòng kiểm tra email của bạn để xác thực tài
             khoản trước khi đăng nhập.
             <div className="mt-4">
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/login">Quay lại đăng nhập</Link>
+              <Button onClick={() => navigate('/login')} variant="outline" className="w-full">
+                Quay lại đăng nhập
               </Button>
             </div>
           </AlertDescription>
@@ -135,9 +136,12 @@ export function RegisterPage() {
 
           <div className="text-center text-sm">
             Đã có tài khoản?{' '}
-            <Link to="/login" className="font-medium text-primary hover:underline">
+            <button
+              onClick={() => navigate('/login')}
+              className="font-medium text-primary hover:underline cursor-pointer"
+            >
               Đăng nhập
-            </Link>
+            </button>
           </div>
         </div>
       )}

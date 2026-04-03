@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Alert, AlertDescription } from '../../components/ui/alert';
@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useEmailVerification } from '../../hooks/email-verification/useEmailVerification';
 
 export function EmailVerificationPage() {
+  const navigate = useNavigate();
   const { status, isResending, handleResendEmail } = useEmailVerification();
 
   return (
@@ -33,8 +34,8 @@ export function EmailVerificationPage() {
                 và trang trại mặc định đã được tạo.
               </AlertDescription>
             </Alert>
-            <Button asChild className="w-full">
-              <Link to="/login">Đăng nhập ngay</Link>
+            <Button onClick={() => navigate('/login')} className="w-full">
+              Đăng nhập ngay
             </Button>
           </div>
         )}
@@ -55,8 +56,8 @@ export function EmailVerificationPage() {
               {isResending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Gửi lại email xác thực
             </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link to="/login">Quay lại đăng nhập</Link>
+            <Button onClick={() => navigate('/login')} variant="outline" className="w-full">
+              Quay lại đăng nhập
             </Button>
           </div>
         )}
