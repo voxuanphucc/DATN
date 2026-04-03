@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // import { useLogoutMutation } from "../hooks/api/useAuthMutations";
 // import { useProfile } from "../hooks/api/useUserQueries";
 // import { useAuthStore } from "../../store/zustand/useAuthStore";
-import { Button } from "../ui/Button";
+import { Button } from "../ui/button";
 import { NavbarDivider } from "./NavbarDivider";
 import LogoBrowser from "../../assets/Logo-browser.png";
 import CornBackground from "../../assets/Corn-Background.png";

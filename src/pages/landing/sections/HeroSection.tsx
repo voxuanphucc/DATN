@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowUpRightIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../components/ui/Button";
+import { Button } from "../../../components/ui/button";
 import { PlantDivider } from "./PlantDivider";
 import { NavbarDivider } from "../../../components/layout/NavbarDivider";
 

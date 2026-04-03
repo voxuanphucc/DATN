@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { PhoneIcon, MailIcon, MapPinIcon } from "lucide-react";
 import { useReveal } from "@/components/hooks/useReveal";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 

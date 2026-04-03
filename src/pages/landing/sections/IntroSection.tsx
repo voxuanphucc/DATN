@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { ArrowUpRightIcon, LeafIcon, BarChart2Icon } from "lucide-react";
 import { useReveal } from "@/components/hooks/useReveal";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import CornIntro from "@/assets/Corn-intro.png";
 
 interface IntroSectionProps {}

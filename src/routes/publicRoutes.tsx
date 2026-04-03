@@ -5,6 +5,8 @@ import { RegisterPage } from '../pages/register';
 import { ForgotPasswordPage } from '../pages/forgot-password';
 import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
+import AcceptInvitationPage from '../pages/AcceptInvitation';
+import TeamManagementPage from '../pages/TeamManagement';
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -30,5 +32,13 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/verify-email',
     element: <EmailVerificationPage />,
+  },
+  {
+    path: '/accept-invitation',
+    element: <AcceptInvitationPage />,
+  },
+  {
+    path: '/team-management',
+    element: <TeamManagementPage />,
   },
 ];
