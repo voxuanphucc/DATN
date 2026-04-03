@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,8 +16,10 @@ import {
   SelectValue,
 } from '../ui/select'
 import { MemberRole, Member } from '../../types/team'
+import { Alert, AlertDescription } from '../ui/alert'
+import { AlertTriangle, Loader2, AlertCircle } from 'lucide-react'
+import { useChangeRole } from '../../hooks/team-management/useChangeRole'
 import { toast } from 'sonner'
-import { AlertTriangle } from 'lucide-react'
 
 interface ChangeRoleDialogProps {
   member: Member | null
@@ -33,25 +34,24 @@ export function ChangeRoleDialog({
   onOpenChange,
   onChangeRole,
 }: ChangeRoleDialogProps) {
-  const [role, setRole] = useState<MemberRole | ''>('')
+  const { form, serverError, onSubmit } = useChangeRole({
+    member,
+    onChangeRoleSuccess: (memberId, newRole) => {
+      onChangeRole(memberId, newRole)
+      toast.success(`Đã cập nhật vai trò cho ${member?.name}`)
+      onOpenChange(false)
+    },
+  })
 
-  useEffect(() => {
-    if (member) {
-      setRole(member.role)
-    }
-  }, [member])
+  const {
+    formState: { errors, isSubmitting },
+    watch,
+  } = form
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!member || !role) return
-
-    onChangeRole(member.id, role as MemberRole)
-    toast.success(`Đã cập nhật vai trò cho ${member.name}`)
-    onOpenChange(false)
-  }
+  const roleValue = watch('role')
 
   const isDowngradingManager =
-    member?.role === 'manager' && (role === 'employee' || role === 'accountant')
+    member?.role === 'manager' && (roleValue === 'employee' || roleValue === 'accountant')
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,20 +62,34 @@ export function ChangeRoleDialog({
             Cập nhật vai trò cho thành viên {member?.name}.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={onSubmit} className="space-y-4 py-4">
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Member Info */}
           <div className="space-y-2">
             <Label>Thành viên</Label>
             <div className="p-2 bg-muted rounded-md text-sm font-medium">
               {member?.name} ({member?.email})
             </div>
           </div>
+
+          {/* Role Select */}
           <div className="space-y-2">
             <Label htmlFor="new-role">Vai trò mới</Label>
             <Select
-              value={role}
-              onValueChange={(value) => setRole(value as MemberRole)}
+              value={roleValue || ''}
+              onValueChange={(value) => form.setValue('role', value as any)}
+              disabled={isSubmitting}
             >
-              <SelectTrigger id="new-role">
+              <SelectTrigger
+                id="new-role"
+                aria-invalid={!!errors.role}
+              >
                 <SelectValue placeholder="Chọn vai trò" />
               </SelectTrigger>
               <SelectContent>
@@ -84,10 +98,14 @@ export function ChangeRoleDialog({
                 <SelectItem value="accountant">Kế toán</SelectItem>
               </SelectContent>
             </Select>
+            {errors.role && (
+              <p className="text-xs text-destructive">{errors.role.message}</p>
+            )}
           </div>
 
+          {/* Warning */}
           <div className="bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900 rounded-md p-3 flex gap-3 text-amber-800 dark:text-amber-200 text-sm">
-            <AlertTriangle className="h-5 w-5 shrink-0" />
+            <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
             <div>
               <p className="font-medium mb-1">
                 Thay đổi vai trò sẽ có hiệu lực ngay lập tức.
@@ -106,10 +124,15 @@ export function ChangeRoleDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Hủy
             </Button>
-            <Button type="submit" disabled={role === member?.role}>
+            <Button
+              type="submit"
+              disabled={roleValue === member?.role || isSubmitting}
+            >
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Xác nhận
             </Button>
           </DialogFooter>

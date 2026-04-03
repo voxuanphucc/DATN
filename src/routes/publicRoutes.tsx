@@ -8,6 +8,11 @@ import { EmailVerificationPage } from '../pages/email-verification';
 import AcceptInvitationPage from '../pages/AcceptInvitation';
 import TeamManagementPage from '../pages/TeamManagement';
 
+/**
+ * Public Routes - Không cần authentication
+ * 
+ * Tạm thời tất cả routes ở đây, sẽ chuyển sang privateRoutes khi cần protected
+ */
 export const publicRoutes: RouteObject[] = [
   {
     path: '/',

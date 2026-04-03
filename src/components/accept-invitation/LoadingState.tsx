@@ -1,12 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../ui/card'
-import { Button } from '../ui/button'
+
 import { Loader2 } from 'lucide-react'
 
 export function LoadingState() {

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,10 @@ import {
   SelectValue,
 } from '../ui/select'
 import { MemberRole, Member } from '../../types/team'
+import { Alert, AlertDescription } from '../ui/alert'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { useInviteMember } from '../../hooks/team-management/useInviteMember'
+import { Input } from '../ui/Input'
 import { toast } from 'sonner'
 
 interface InviteDialogProps {
@@ -26,69 +29,35 @@ interface InviteDialogProps {
   existingMembers: Member[]
 }
 
-const CURRENT_USER_EMAIL = 'an.nguyen@example.com'
-
 export function InviteDialog({
   open,
   onOpenChange,
   onInvite,
   existingMembers,
 }: InviteDialogProps) {
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState<MemberRole | ''>('')
-  const [error, setError] = useState('')
+  const { form, serverError, onSubmit } = useInviteMember({
+    existingMembers,
+    onInviteSuccess: (email, role) => {
+      onInvite(email, role)
+      toast.success('Đã gửi lời mời thành công')
+      onOpenChange(false)
+    },
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  const {
+    register,
+    formState: { errors, isSubmitting },
+    watch,
+  } = form
 
-    if (!email) {
-      setError('Vui lòng nhập email')
-      return
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setError('Email không hợp lệ')
-      return
-    }
-
-    if (email.toLowerCase() === CURRENT_USER_EMAIL.toLowerCase()) {
-      setError('Không thể tự mời chính mình')
-      return
-    }
-
-    const isExisting = existingMembers.some(
-      (m) => m.email.toLowerCase() === email.toLowerCase(),
-    )
-    if (isExisting) {
-      setError('Email này đã là thành viên của trang trại')
-      return
-    }
-
-    if (!role) {
-      setError('Vui lòng chọn vai trò')
-      return
-    }
-
-    onInvite(email, role as MemberRole)
-    toast.success('Đã gửi lời mời thành công')
-
-    // Reset form
-    setEmail('')
-    setRole('')
-    setError('')
-    onOpenChange(false)
-  }
+  const roleValue = watch('role')
 
   return (
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          setEmail('')
-          setRole('')
-          setError('')
+          form.reset()
         }
         onOpenChange(isOpen)
       }}
@@ -100,31 +69,41 @@ export function InviteDialog({
             Gửi lời mời tham gia trang trại qua email và phân quyền vai trò.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={onSubmit} className="space-y-4 py-4">
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="email">Địa chỉ Email</Label>
-            <input
+            <Input
               id="email"
               type="email"
               placeholder="nhanvien@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-                error && error.includes('Email') ? 'border-destructive' : ''
-              }`}
+              disabled={isSubmitting}
+              aria-invalid={!!errors.email}
+              {...register('email')}
             />
+            {errors.email && (
+              <p className="text-xs text-destructive">{errors.email.message}</p>
+            )}
           </div>
+
+          {/* Role */}
           <div className="space-y-2">
             <Label htmlFor="role">Vai trò</Label>
             <Select
-              value={role}
-              onValueChange={(value) => setRole(value as MemberRole)}
+              value={roleValue || ''}
+              onValueChange={(value) => form.setValue('role', value as any)}
+              disabled={isSubmitting}
             >
               <SelectTrigger
                 id="role"
-                className={
-                  error && error.includes('Vai trò') ? 'border-destructive' : ''
-                }
+                aria-invalid={!!errors.role}
               >
                 <SelectValue placeholder="Chọn vai trò" />
               </SelectTrigger>
@@ -134,19 +113,24 @@ export function InviteDialog({
                 <SelectItem value="accountant">Kế toán</SelectItem>
               </SelectContent>
             </Select>
+            {errors.role && (
+              <p className="text-xs text-destructive">{errors.role.message}</p>
+            )}
           </div>
-          {error && (
-            <p className="text-sm text-destructive font-medium">{error}</p>
-          )}
+
           <DialogFooter className="pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
             >
               Hủy
             </Button>
-            <Button type="submit">Gửi lời mời</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Gửi lời mời
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
