@@ -1,18 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { inviteMemberService } from '../../services/invite-member';
+import { getProfileService } from '../../services/get-profile';
 import { inviteMemberSchema, type InviteMemberFormValues } from '../../lib/schemas/team.schemas';
 import { Member, MemberRole } from '../../types/team';
-
-const CURRENT_USER_EMAIL = 'an.nguyen@example.com';
 
 interface UseInviteMemberProps {
   existingMembers: Member[];
   onInviteSuccess: (email: string, role: MemberRole) => void;
 }
 
+/**
+ * useInviteMember Hook
+ * Xử lý logic mời thành viên vào trang trại
+ * - Validate email không trùng thành viên hiện tại
+ * - Gọi API mời
+ * - Xử lý errors
+ */
 export function useInviteMember({ existingMembers, onInviteSuccess }: UseInviteMemberProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+  // Fetch current user email
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const response = await getProfileService.getProfile();
+        if (response.success) {
+          setCurrentUserEmail(response.data.email);
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin user:', error);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
 
   const form = useForm<InviteMemberFormValues>({
     resolver: zodResolver(inviteMemberSchema),
@@ -26,7 +51,7 @@ export function useInviteMember({ existingMembers, onInviteSuccess }: UseInviteM
     setServerError(null);
 
     // Validate against current user
-    if (data.email.toLowerCase() === CURRENT_USER_EMAIL.toLowerCase()) {
+    if (currentUserEmail && data.email.toLowerCase() === currentUserEmail.toLowerCase()) {
       form.setError('email', {
         type: 'manual',
         message: 'Không thể tự mời chính mình',
@@ -36,7 +61,7 @@ export function useInviteMember({ existingMembers, onInviteSuccess }: UseInviteM
 
     // Validate against existing members
     const isExisting = existingMembers.some(
-      (m) => m.email.toLowerCase() === data.email.toLowerCase(),
+      (m) => m.email.toLowerCase() === data.email.toLowerCase()
     );
     if (isExisting) {
       form.setError('email', {
@@ -46,26 +71,32 @@ export function useInviteMember({ existingMembers, onInviteSuccess }: UseInviteM
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      // TODO: Thay thế mock bằng API thực tế khi backend sẵn sàng
-      // await teamApi.inviteMember({ email: data.email, role: data.role });
+      const response = await inviteMemberService.inviteMember({
+        email: data.email,
+        role: data.role as MemberRole,
+      });
 
-      // --- MOCK: Xóa khi tích hợp API ---
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // --- HẾT MOCK ---
-
-      onInviteSuccess(data.email, data.role as MemberRole);
-
-      // Reset form
-      form.reset();
-    } catch {
-      setServerError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+      if (response.success) {
+        onInviteSuccess(data.email, data.role as MemberRole);
+        // Reset form
+        form.reset();
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+      setServerError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     form,
     serverError,
+    isLoading,
     onSubmit: form.handleSubmit(onSubmit),
   };
 }

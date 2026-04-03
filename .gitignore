@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Agent skills (development only)
+.agents
+
 # Environment variables
 .env
 .env.local

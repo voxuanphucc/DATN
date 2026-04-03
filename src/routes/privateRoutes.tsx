@@ -1,15 +1,23 @@
 import { RouteObject } from 'react-router-dom';
+import { PrivateRoute } from '../components/routes';
+import TeamManagementPage from '../pages/TeamManagement';
 
 /**
- * Private Routes - Cần authentication (được protected)
+ * Private Routes - Cần authentication (được protected bởi PrivateRoute)
  * 
- * TODO: Sẽ thêm routes cần authentication ở đây
- * Ví dụ: Dashboard, User Profile, Settings, etc.
- * 
- * Format:
+ * Ví dụ:
  * {
  *   path: '/dashboard',
  *   element: <PrivateRoute><DashboardPage /></PrivateRoute>,
  * }
  */
-export const privateRoutes: RouteObject[] = [];
+export const privateRoutes: RouteObject[] = [
+  {
+    path: '/team-management',
+    element: (
+      <PrivateRoute>
+        <TeamManagementPage />
+      </PrivateRoute>
+    ),
+  },
+];

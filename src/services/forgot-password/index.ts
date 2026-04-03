@@ -1,0 +1,1 @@
+export { forgotPasswordService } from './forgotPasswordService';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { changeRoleService } from '../../services/change-role';
 import { changeRoleSchema, type ChangeRoleFormValues } from '../../lib/schemas/team.schemas';
 import { Member, MemberRole } from '../../types/team';
 
@@ -9,8 +10,17 @@ interface UseChangeRoleProps {
   onChangeRoleSuccess: (memberId: string, newRole: MemberRole) => void;
 }
 
+/**
+ * useChangeRole Hook
+ * Xử lý logic thay đổi vai trò của thành viên
+ * - Validate member hiện tại
+ * - Check không thể thay đổi nếu role giống nhau
+ * - Gọi API change role
+ * - Callback khi thành công
+ */
 export function useChangeRole({ member, onChangeRoleSuccess }: UseChangeRoleProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ChangeRoleFormValues>({
     resolver: zodResolver(changeRoleSchema),
@@ -41,26 +51,32 @@ export function useChangeRole({ member, onChangeRoleSuccess }: UseChangeRoleProp
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      // TODO: Thay thế mock bằng API thực tế khi backend sẵn sàng
-      // await teamApi.changeRole({ memberId: member.id, newRole: data.role });
+      const response = await changeRoleService.changeRole({
+        memberId: member.id,
+        newRole: data.role as MemberRole,
+      });
 
-      // --- MOCK: Xóa khi tích hợp API ---
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // --- HẾT MOCK ---
-
-      onChangeRoleSuccess(member.id, data.role as MemberRole);
-
-      // Reset to current state
-      form.reset();
-    } catch {
-      setServerError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+      if (response.success) {
+        onChangeRoleSuccess(member.id, data.role as MemberRole);
+        // Reset to current state
+        form.reset();
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+      setServerError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     form,
     serverError,
+    isLoading,
     onSubmit: form.handleSubmit(onSubmit),
   };
 }

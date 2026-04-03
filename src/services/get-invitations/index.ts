@@ -1,0 +1,1 @@
+export { getInvitationsService } from './getInvitationsService';

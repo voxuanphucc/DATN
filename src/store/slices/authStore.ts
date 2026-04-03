@@ -1,25 +1,28 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { User } from '../../types/auth';
+import type { UserProfileDto } from '../../types/get-profile';
 
 // ─── State & Actions ────────────────────────────────────────────────────────
 
 interface AuthState {
-  user: User | null;
-  token: string | null;
+  user: UserProfileDto | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
 
 interface AuthActions {
-  /** Đăng nhập: lưu user + token, tự động persist vào localStorage */
-  login: (user: User, token: string) => void;
+  /** Đăng nhập: lưu user + tokens, tự động persist vào localStorage */
+  login: (user: UserProfileDto, accessToken: string, refreshToken: string) => void;
   /** Đăng xuất: xóa toàn bộ auth state */
   logout: () => void;
   /** Cập nhật thông tin user (dùng khi refresh profile) */
-  setUser: (user: User | null) => void;
-  /** Cập nhật token (dùng khi refresh token) */
-  setToken: (token: string | null) => void;
+  setUser: (user: UserProfileDto | null) => void;
+  /** Cập nhật access token (dùng khi refresh token) */
+  setAccessToken: (token: string | null) => void;
+  /** Cập nhật refresh token */
+  setRefreshToken: (token: string | null) => void;
   /** Bật / tắt loading (dùng khi đang gọi auth API) */
   setLoading: (loading: boolean) => void;
 }
@@ -30,7 +33,8 @@ export type AuthStore = AuthState & AuthActions;
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   isAuthenticated: false,
   isLoading: false,
 };
@@ -41,11 +45,11 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...initialState,
-
-      login: (user, token) =>
+accessToken, refreshToken) =>
         set({
           user,
-          token,
+          accessToken,
+          refreshToken,
           isAuthenticated: true,
           isLoading: false,
         }),
@@ -53,7 +57,8 @@ export const useAuthStore = create<AuthStore>()(
       logout: () =>
         set({
           user: null,
-          token: null,
+          accessToken: null,
+          refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
         }),
@@ -64,10 +69,15 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: state.isAuthenticated && user !== null,
         })),
 
-      setToken: (token) =>
+      setAccessToken: (accessToken) =>
         set({
-          token,
-          isAuthenticated: token !== null,
+          accessToken,
+          isAuthenticated: accessToken !== null,
+        }),
+
+      setRefreshToken: (refreshToken) =>
+        set({
+          refreshToken,
         }),
 
       setLoading: (loading) => set({ isLoading: loading }),
@@ -78,7 +88,8 @@ export const useAuthStore = create<AuthStore>()(
       // Chỉ persist những field cần thiết, không persist isLoading
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     },
@@ -93,8 +104,11 @@ export const selectUser = (state: AuthStore) => state.user;
 /** Kiểm tra đã đăng nhập chưa */
 export const selectIsAuthenticated = (state: AuthStore) => state.isAuthenticated;
 
-/** Lấy token hiện tại */
-export const selectToken = (state: AuthStore) => state.token;
+/** Lấy access token hiện tại */
+export const selectAccessToken = (state: AuthStore) => state.accessToken;
+
+/** Lấy refresh token hiện tại */
+export const selectRefreshToken = (state: AuthStore) => state.refreshToken;
 
 /** Kiểm tra trạng thái loading của auth */
 export const selectAuthLoading = (state: AuthStore) => state.isLoading;

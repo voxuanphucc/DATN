@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { resetPasswordService } from '../../services/reset-password';
 import { resetPasswordSchema, type ResetPasswordFormValues } from '../../lib/schemas/auth.schemas';
 
-// ---------------------------------------------------------
-// TODO: Thay thế mock bằng API thực tế khi backend sẵn sàng
-// import { authApi } from '../../../services/api/authApi';
-// ---------------------------------------------------------
-
+/**
+ * useResetPassword Hook
+ * Xử lý logic reset password sau khi nhân được link từ email
+ * - Validate token từ URL
+ * - Submit form reset password
+ * - Redirect đến login sau thành công
+ */
 export function useResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -16,37 +19,43 @@ export function useResetPassword() {
 
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // TODO: Trong thực tế, validate token với backend khi mount component
-  // Hiện tại giả định token hợp lệ nếu có trong URL
   const isTokenValid = Boolean(token);
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (_data: ResetPasswordFormValues) => {
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     setServerError(null);
 
-    if (!isTokenValid) {
+    if (!isTokenValid || !token) {
       setServerError('Token không hợp lệ hoặc đã hết hạn');
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      // TODO: Thay thế đoạn mock dưới bằng API call thực tế:
-      // await authApi.resetPassword({ token, newPassword: data.password });
-      // setIsSuccess(true);
-      // setTimeout(() => navigate('/login'), 3000);
+      const response = await resetPasswordService.resetPassword({
+        token,
+        newPassword: data.password,
+        confirmPassword: data.confirmPassword,
+      });
 
-      // --- MOCK: Xóa khi tích hợp API ---
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // --- HẾT MOCK ---
-
-      setIsSuccess(true);
-      setTimeout(() => navigate('/login'), 3000);
-    } catch {
-      setServerError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+      if (response.success) {
+        setIsSuccess(true);
+        // Redirect đến login sau 2 giây
+        setTimeout(() => navigate('/login'), 2000);
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error?.message ||
+        'Đã có lỗi xảy ra. Token có thể đã hết hạn. Vui lòng yêu cầu link mới.';
+      setServerError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,6 +63,7 @@ export function useResetPassword() {
     form,
     serverError,
     isSuccess,
+    isLoading,
     isTokenValid,
     token,
     onSubmit: form.handleSubmit(onSubmit),
