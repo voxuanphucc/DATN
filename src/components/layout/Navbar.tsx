@@ -163,8 +163,8 @@ export function Navbar({
             <img
               src={LogoBrowser}
               alt="FarmerAI corn logo"
-              className={`object-contain transition-all duration-500 ease-out w-auto
-                ${scrolled ? "h-[36px]" : "h-[50px]"}
+              className={`object-contain transition-all duration-500 ease-out w-auto shrink-0
+                ${scrolled ? "h-[32px]" : "h-[50px]"}
                 ${mounted ? "animate-logo-spin" : ""}`}
               style={{
                 animation: mounted
@@ -173,8 +173,8 @@ export function Navbar({
               }}
             />
             <span
-              className={`font-roboto font-black leading-none transition-all duration-500 text-[#FDFFDD] ${
-                scrolled ? "text-[28px]" : "text-[38px]"
+              className={`font-roboto font-black leading-none transition-all duration-500 whitespace-nowrap ${
+                scrolled ? "text-[26px] text-[#E8C840]" : "text-[38px] text-[#FDFFDD]"
               }`}
             >
               FarmerAI
