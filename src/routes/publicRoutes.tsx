@@ -1,5 +1,5 @@
 import { RouteObject } from 'react-router-dom';
-import { LandingPage } from '../pages/landing';
+import LandingPage from '../pages/landing';
 import { LoginPage } from '../pages/login';
 import { RegisterPage } from '../pages/register';
 import { ForgotPasswordPage } from '../pages/forgot-password';

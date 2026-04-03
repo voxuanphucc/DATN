@@ -44,11 +44,15 @@ export default {content: [
         'sidebar-accent-foreground': 'var(--sidebar-accent-foreground)',
         'sidebar-border': 'var(--sidebar-border)',
         'sidebar-ring': 'var(--sidebar-ring)',
-        'destructive-foreground': 'var(--destructive-foreground)'
+        'destructive-foreground': 'var(--destructive-foreground)',
+        'light-yellow-2': '#ECF0A4',
+        'light-yellow-3': '#DCE1A8'
       },
       fontFamily: {
         heading: ['Geist'],
-        mono: ['"Geist Mono"']
+        mono: ['"Geist Mono"'],
+        playfair: ['"Playfair Display"', 'serif'],
+        roboto: ['Roboto', 'sans-serif']
       }
     }
   }

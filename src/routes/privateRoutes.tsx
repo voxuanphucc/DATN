@@ -1,7 +1,9 @@
 import React from 'react';
 import { RouteObject, Navigate } from 'react-router-dom';
-// Placeholder pages for future private routes
-// These will be implemented when dashboard pages are built
+import { useAuthStore, selectIsAuthenticated } from '../store';
+
+// ─── Placeholder pages (sẽ được thay bằng trang thực khi phát triển) ─────────
+
 function DashboardPlaceholder() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -11,47 +13,55 @@ function DashboardPlaceholder() {
           Trang này đang được phát triển...
         </p>
       </div>
-    </div>);
-
+    </div>
+  );
 }
-// In a real app, this would check auth state
-const isAuthenticated = false;
-function PrivateRoute({ children }: {children: React.ReactNode;}) {
+
+// ─── Private Route Guard ─────────────────────────────────────────────────────
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
   return <>{children}</>;
 }
+
+// ─── Private Routes ───────────────────────────────────────────────────────────
+
 export const privateRoutes: RouteObject[] = [
-{
-  path: '/dashboard',
-  element:
-  <PrivateRoute>
+  {
+    path: '/dashboard',
+    element: (
+      <PrivateRoute>
         <DashboardPlaceholder />
       </PrivateRoute>
-
-},
-{
-  path: '/farm-management',
-  element:
-  <PrivateRoute>
+    ),
+  },
+  {
+    path: '/farm-management',
+    element: (
+      <PrivateRoute>
         <DashboardPlaceholder />
       </PrivateRoute>
-
-},
-{
-  path: '/tasks',
-  element:
-  <PrivateRoute>
+    ),
+  },
+  {
+    path: '/tasks',
+    element: (
+      <PrivateRoute>
         <DashboardPlaceholder />
       </PrivateRoute>
-
-},
-{
-  path: '/finance',
-  element:
-  <PrivateRoute>
+    ),
+  },
+  {
+    path: '/finance',
+    element: (
+      <PrivateRoute>
         <DashboardPlaceholder />
       </PrivateRoute>
-
-}];
+    ),
+  },
+];

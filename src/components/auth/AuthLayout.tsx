@@ -25,7 +25,7 @@ export function AuthLayout({
               
               <Leaf className="h-8 w-8" />
               <span className="text-2xl font-bold tracking-tight">
-                AgriManage
+                FarmerAI
               </span>
             </Link>
             <h2 className="mt-5 text-3xl font-bold tracking-tight text-foreground">
