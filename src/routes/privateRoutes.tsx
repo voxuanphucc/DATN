@@ -1,66 +1,22 @@
-import React from 'react';
-import { RouteObject, Navigate } from 'react-router-dom';
-import { useAuthStore, selectIsAuthenticated } from '../store';
+import { RouteObject } from 'react-router-dom';
+import { PrivateRoute } from '../components/routes';
+import TeamManagementPage from '../pages/TeamManagement';
 
-// ─── Placeholder pages (sẽ được thay bằng trang thực khi phát triển) ─────────
-
-function DashboardPlaceholder() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Bảng điều khiển</h1>
-        <p className="text-muted-foreground">
-          Trang này đang được phát triển...
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Private Route Guard ─────────────────────────────────────────────────────
-
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-// ─── Private Routes ───────────────────────────────────────────────────────────
-
+/**
+ * Private Routes - Cần authentication (được protected bởi PrivateRoute)
+ * 
+ * Ví dụ:
+ * {
+ *   path: '/dashboard',
+ *   element: <PrivateRoute><DashboardPage /></PrivateRoute>,
+ * }
+ */
 export const privateRoutes: RouteObject[] = [
   {
-    path: '/dashboard',
+    path: '/team-management',
     element: (
       <PrivateRoute>
-        <DashboardPlaceholder />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/farm-management',
-    element: (
-      <PrivateRoute>
-        <DashboardPlaceholder />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/tasks',
-    element: (
-      <PrivateRoute>
-        <DashboardPlaceholder />
-      </PrivateRoute>
-    ),
-  },
-  {
-    path: '/finance',
-    element: (
-      <PrivateRoute>
-        <DashboardPlaceholder />
+        <TeamManagementPage />
       </PrivateRoute>
     ),
   },

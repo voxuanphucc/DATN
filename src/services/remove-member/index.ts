@@ -1,0 +1,1 @@
+export { removeMemberService } from './removeMemberService';

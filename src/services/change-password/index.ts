@@ -1,0 +1,1 @@
+export { changePasswordService } from './changePasswordService';

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useRegister } from '../../hooks/register/useRegister';
 
 export function RegisterPage() {
+  const navigate = useNavigate();
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -18,128 +19,165 @@ export function RegisterPage() {
   return (
     <AuthLayout
       title="Tạo tài khoản mới"
-      subtitle="Bắt đầu hành trình quản lý trang trại thông minh của bạn ngay hôm nay."
-      imageSrc="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop"
+      subtitle="Bắt đầu quản lý trang trại thông minh ngay hôm nay."
+      imageSrc="https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=2000&auto=format&fit=crop"
     >
+      <style>{`
+        .input-field {
+          transition: all 0.2s ease;
+          border: 1px solid rgba(5, 150, 105, 0.2);
+          background-color: rgba(5, 150, 105, 0.03);
+        }
+        
+        .input-field:focus {
+          border-color: rgba(5, 150, 105, 0.5);
+          background-color: white;
+          box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+      `}</style>
+
       {isSuccess ? (
-        <Alert className="border-green-500 bg-green-50 dark:bg-green-950/50">
-          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            Đăng ký thành công! Vui lòng kiểm tra email của bạn để xác thực tài
-            khoản trước khi đăng nhập.
-            <div className="mt-4">
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/login">Quay lại đăng nhập</Link>
+        <Alert className="border-green-500 bg-green-50">
+          <CheckCircle2 className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            Đăng ký thành công! Kiểm tra email để xác thực tài khoản.
+            <div className="mt-3">
+              <Button 
+                onClick={() => navigate('/login')} 
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm h-9"
+              >
+                Quay lại đăng nhập
               </Button>
             </div>
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="grid gap-4">
-          <form onSubmit={onSubmit}>
-            <div className="grid gap-3">
-              {serverError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{serverError}</AlertDescription>
-                </Alert>
+        <form onSubmit={onSubmit} className="space-y-3">
+          {serverError && (
+            <Alert variant="destructive" className="bg-red-50 border-red-200">
+              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertDescription className="text-red-800 text-sm">
+                {serverError}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Form Fields Group */}
+          <div className="space-y-2.5">
+            {/* Full Name */}
+            <div className="space-y-1">
+              <Label htmlFor="fullName" className="text-xs font-semibold text-foreground">
+                Họ và tên <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="fullName"
+                placeholder="Nguyễn Văn A"
+                disabled={isSubmitting}
+                aria-invalid={!!errors.fullName}
+                {...register('fullName')}
+                className="input-field h-9 rounded-lg text-sm"
+              />
+              {errors.fullName && (
+                <p className="text-xs text-red-600">{errors.fullName.message}</p>
               )}
-
-              {/* Full name */}
-              <div className="grid gap-1">
-                <Label htmlFor="fullName">
-                  Họ và tên <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="fullName"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.fullName}
-                  {...register('fullName')}
-                />
-                {errors.fullName && (
-                  <p className="text-xs text-destructive">{errors.fullName.message}</p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className="grid gap-1">
-                <Label htmlFor="email">
-                  Email <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.email}
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-xs text-destructive">{errors.email.message}</p>
-                )}
-              </div>
-
-              {/* Farm name */}
-              <div className="grid gap-1">
-                <Label htmlFor="farmName">Tên trang trại</Label>
-                <Input
-                  id="farmName"
-                  placeholder="Trang trại của tôi"
-                  disabled={isSubmitting}
-                  {...register('farmName')}
-                />
-              </div>
-
-              {/* Password */}
-              <div className="grid gap-1">
-                <Label htmlFor="password">
-                  Mật khẩu <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.password}
-                  {...register('password')}
-                />
-                {errors.password ? (
-                  <p className="text-xs text-destructive">{errors.password.message}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">≥ 8 ký tự, có chữ hoa và số</p>
-                )}
-              </div>
-
-              {/* Confirm password */}
-              <div className="grid gap-1">
-                <Label htmlFor="confirmPassword">
-                  Xác nhận mật khẩu <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.confirmPassword}
-                  {...register('confirmPassword')}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-
-              <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Đăng ký tài khoản
-              </Button>
             </div>
-          </form>
 
-          <div className="text-center text-sm">
-            Đã có tài khoản?{' '}
-            <Link to="/login" className="font-medium text-primary hover:underline">
-              Đăng nhập
-            </Link>
+            {/* Email */}
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-xs font-semibold text-foreground">
+                Email <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                disabled={isSubmitting}
+                aria-invalid={!!errors.email}
+                {...register('email')}
+                className="input-field h-9 rounded-lg text-sm"
+              />
+              {errors.email && (
+                <p className="text-xs text-red-600">{errors.email.message}</p>
+              )}
+            </div>
+
+            {/* Farm Name */}
+            <div className="space-y-1">
+              <Label htmlFor="farmName" className="text-xs font-semibold text-foreground">
+                Tên trang trại
+              </Label>
+              <Input
+                id="farmName"
+                placeholder="Trang trại của tôi"
+                disabled={isSubmitting}
+                {...register('farmName')}
+                className="input-field h-9 rounded-lg text-sm"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-xs font-semibold text-foreground">
+                Mật khẩu <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                disabled={isSubmitting}
+                aria-invalid={!!errors.password}
+                {...register('password')}
+                className="input-field h-9 rounded-lg text-sm"
+              />
+              {errors.password ? (
+                <p className="text-xs text-red-600">{errors.password.message}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">≥ 8 ký tự, có chữ hoa và số</p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-1">
+              <Label htmlFor="confirmPassword" className="text-xs font-semibold text-foreground">
+                Xác nhận mật khẩu <span className="text-red-600">*</span>
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                disabled={isSubmitting}
+                aria-invalid={!!errors.confirmPassword}
+                {...register('confirmPassword')}
+                className="input-field h-9 rounded-lg text-sm"
+              />
+              {errors.confirmPassword && (
+                <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
+              )}
+            </div>
           </div>
-        </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full h-9 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all mt-3 text-sm"
+          >
+            {isSubmitting && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+            {isSubmitting ? 'Đang đăng ký...' : 'Đăng ký'}
+          </Button>
+
+          {/* Sign In Link */}
+          <div className="text-center pt-1">
+            <p className="text-xs text-foreground">
+              Đã có tài khoản?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/login')}
+                className="font-semibold text-primary hover:opacity-80"
+              >
+                Đăng nhập
+              </button>
+            </p>
+          </div>
+        </form>
       )}
     </AuthLayout>
   );

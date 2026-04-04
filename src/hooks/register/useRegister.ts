@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { mockUsers } from '../../types/auth';
+import { registerService } from '../../services/register';
 import { registerSchema, type RegisterFormValues } from '../../lib/schemas/auth.schemas';
 
-// ---------------------------------------------------------
-// TODO: Thay thế mock bằng API thực tế khi backend sẵn sàng
-// import { authApi } from '../../../services/api/authApi';
-// ---------------------------------------------------------
-
+/**
+ * useRegister Hook
+ * Xử lý logic đăng ký tài khoản
+ * - Validation form với React Hook Form + Zod
+ * - Gọi API register
+ * - Xử lý lỗi (email trùng, etc.)
+ * - Chuyển hướng sang email verification
+ */
 export function useRegister() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -19,29 +24,26 @@ export function useRegister() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     setServerError(null);
+    setIsLoading(true);
 
     try {
-      // TODO: Thay thế đoạn mock dưới bằng API call thực tế:
-      // const response = await authApi.register({
-      //   fullName: data.fullName,
-      //   email: data.email,
-      //   password: data.password,
-      //   farmName: data.farmName,
-      // });
-      // setIsSuccess(true);
+      const response = await registerService.register({
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+        farmName: data.farmName,
+      });
 
-      // --- MOCK: Xóa khi tích hợp API ---
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (mockUsers.some((u) => u.email === data.email)) {
-        setServerError('Email đã được sử dụng');
-        return;
+      if (response.success) {
+        setIsSuccess(true);
+        setRegisteredEmail(data.email);
       }
-      // --- HẾT MOCK ---
-
-      setIsSuccess(true);
-    } catch {
-      setServerError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+      setServerError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,6 +51,8 @@ export function useRegister() {
     form,
     serverError,
     isSuccess,
+    isLoading,
+    registeredEmail,
     onSubmit: form.handleSubmit(onSubmit),
   };
 }

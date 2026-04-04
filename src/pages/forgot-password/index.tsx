@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthLayout } from '../../components/auth/AuthLayout';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
 import { useForgotPassword } from '../../hooks/forgot-password/useForgotPassword';
 
 export function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -30,11 +31,9 @@ export function ForgotPasswordPage() {
               Vui lòng kiểm tra hộp thư đến.
             </AlertDescription>
           </Alert>
-          <Button asChild variant="outline" className="w-full">
-            <Link to="/login">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Quay lại đăng nhập
-            </Link>
+          <Button onClick={() => navigate('/login')} variant="outline" className="w-full">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Quay lại đăng nhập
           </Button>
         </div>
       ) : (
@@ -71,13 +70,13 @@ export function ForgotPasswordPage() {
           </form>
 
           <div className="text-center text-sm">
-            <Link
-              to="/login"
-              className="font-medium text-primary hover:underline flex items-center justify-center"
+            <button
+              onClick={() => navigate('/login')}
+              className="font-medium text-primary hover:underline flex items-center justify-center cursor-pointer"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Quay lại đăng nhập
-            </Link>
+            </button>
           </div>
         </div>
       )}

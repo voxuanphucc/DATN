@@ -3,7 +3,8 @@ export {
   useAuthStore,
   selectUser,
   selectIsAuthenticated,
-  selectToken,
+  selectAccessToken,
+  selectRefreshToken,
   selectAuthLoading,
   type AuthStore,
 } from './authStore';

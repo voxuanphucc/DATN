@@ -5,7 +5,14 @@ import { RegisterPage } from '../pages/register';
 import { ForgotPasswordPage } from '../pages/forgot-password';
 import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
+import AcceptInvitationPage from '../pages/AcceptInvitation';
 
+/**
+ * Public Routes - Không cần authentication
+ * 
+ * Các routes cần authentication được move sang privateRoutes.tsx
+ * và wrapping bởi <PrivateRoute></PrivateRoute>
+ */
 export const publicRoutes: RouteObject[] = [
   {
     path: '/',
@@ -30,5 +37,9 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/verify-email',
     element: <EmailVerificationPage />,
+  },
+  {
+    path: '/accept-invitation',
+    element: <AcceptInvitationPage />,
   },
 ];

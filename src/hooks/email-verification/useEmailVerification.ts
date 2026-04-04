@@ -1,58 +1,76 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-// ---------------------------------------------------------
-// TODO: Thay thế mock bằng API thực tế khi backend sẵn sàng
-// import { authApi } from '../../services/api/authApi';
-// ---------------------------------------------------------
+import { emailVerificationService } from '../../services/email-verification';
 
 type VerificationStatus = 'loading' | 'success' | 'error';
 
+/**
+ * useEmailVerification Hook
+ * Xác thực email dựa vào token từ URL params
+ * - Tự động verify email khi component mount
+ * - Hỗ trợ resend verification email
+ */
 export function useEmailVerification() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const email = searchParams.get('email');
 
   const [status, setStatus] = useState<VerificationStatus>('loading');
   const [isResending, setIsResending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const verifyToken = async () => {
-      try {
-        // TODO: Thay thế đoạn mock dưới bằng API call thực tế:
-        // const response = await authApi.verifyEmail({ token });
-        // setStatus(response.success ? 'success' : 'error');
-
-        // --- MOCK: Xóa khi tích hợp API ---
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        if (!token || token === 'expired') {
-          setStatus('error');
-        } else {
-          setStatus('success');
-        }
-        // --- HẾT MOCK ---
-      } catch {
+      // Nếu không có token, set error
+      if (!token) {
         setStatus('error');
+        setErrorMessage('Token xác thực không hợp lệ');
+        return;
+      }
+
+      try {
+        const response = await emailVerificationService.verifyEmail({
+          email: email || '',
+          code: token,
+          purpose: 'registration',
+        });
+
+        if (response.success) {
+          setStatus('success');
+        } else {
+          setStatus('error');
+          setErrorMessage('Không thể xác thực email. Vui lòng thử lại.');
+        }
+      } catch (error: any) {
+        setStatus('error');
+        const message =
+          error.response?.data?.error?.message || 'Đã có lỗi xảy ra khi xác thực email.';
+        setErrorMessage(message);
       }
     };
 
     verifyToken();
-  }, [token]);
+  }, [token, email]);
 
   const handleResendEmail = async () => {
     setIsResending(true);
+    setErrorMessage(null);
+
     try {
-      // TODO: Thay thế đoạn mock dưới bằng API call thực tế:
-      // await authApi.resendVerificationEmail();
+      if (!email) {
+        setErrorMessage('Email không hợp lệ');
+        return;
+      }
 
-      // --- MOCK: Xóa khi tích hợp API ---
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // --- HẾT MOCK ---
+      const response = await emailVerificationService.resendVerificationEmail(email);
 
-      // Reset lại trạng thái để thông báo thành công
-      alert('Email xác thực đã được gửi lại!');
-    } catch {
-      alert('Không thể gửi lại email. Vui lòng thử lại.');
+      if (response.success) {
+        alert('Email xác thực đã được gửi lại! Vui lòng kiểm tra hộp thư của bạn.');
+      }
+    } catch (error: any) {
+      const message =
+        error.response?.data?.error?.message || 'Không thể gửi lại email. Vui lòng thử lại.';
+      setErrorMessage(message);
     } finally {
       setIsResending(false);
     }
@@ -60,8 +78,10 @@ export function useEmailVerification() {
 
   return {
     token,
+    email,
     status,
     isResending,
+    errorMessage,
     handleResendEmail,
   };
 }
