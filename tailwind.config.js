@@ -45,14 +45,18 @@ export default {content: [
         'sidebar-border': 'var(--sidebar-border)',
         'sidebar-ring': 'var(--sidebar-ring)',
         'destructive-foreground': 'var(--destructive-foreground)',
+        'light-yellow-1': '#FDFFDD',
         'light-yellow-2': '#ECF0A4',
-        'light-yellow-3': '#DCE1A8'
+        'light-yellow-3': '#DCE1A8',
+        'cta-yellow': '#F8FF5B',
+        'dark-olive': '#2D3A1E'
       },
       fontFamily: {
         heading: ['Geist'],
         mono: ['"Geist Mono"'],
         playfair: ['"Playfair Display"', 'serif'],
-        roboto: ['Roboto', 'sans-serif']
+        roboto: ['Roboto', 'sans-serif'],
+        prompt: ['"Prompt"', 'sans-serif']
       }
     }
   }

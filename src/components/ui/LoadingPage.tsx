@@ -6,7 +6,7 @@ import { cn } from "./utils";
 const loadingFallbackVariants = cva("flex items-center justify-center", {
   variants: {
     size: {
-      fullscreen: "min-h-screen",
+      fullscreen: "fixed inset-0 w-screen h-screen",
       inline: "h-32",
       sm: "h-20",
     },
@@ -21,17 +21,15 @@ const loadingFallbackVariants = cva("flex items-center justify-center", {
   },
 });
 
-export interface LoadingFallbackProps
-  extends
-    React.HTMLAttributes<HTMLDivElement>,
+export interface LoadingPageProps
+  extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof loadingFallbackVariants> {
   text?: string | React.ReactNode;
   showText?: boolean;
-  /** Control visibility of the loading overlay (backward compatibility) */
   isVisible?: boolean;
 }
 
-const LoadingFallback = React.forwardRef<HTMLDivElement, LoadingFallbackProps>(
+const LoadingPage = React.forwardRef<HTMLDivElement, LoadingPageProps>(
   (
     {
       size = "fullscreen",
@@ -51,7 +49,7 @@ const LoadingFallback = React.forwardRef<HTMLDivElement, LoadingFallbackProps>(
         ref={ref}
         className={cn(
           loadingFallbackVariants({ size, layout }),
-          "bg-gradient-to-b from-green-50 to-emerald-50",
+          "bg-gradient-to-b from-green-50 to-emerald-50 z-[9999]",
           className,
         )}
         {...props}
@@ -117,7 +115,9 @@ const LoadingFallback = React.forwardRef<HTMLDivElement, LoadingFallbackProps>(
           {/* Text */}
           {showText && (
             <div className="text-center">
-              <p className="text-lg font-semibold text-green-700 mb-1">{text}</p>
+              <p className="text-lg font-semibold text-green-700 mb-1">
+                {text}
+              </p>
               <p className="text-sm text-green-600 animate-pulse">
                 FarmerAI đang xử lý dữ liệu của bạn
               </p>
@@ -131,7 +131,7 @@ const LoadingFallback = React.forwardRef<HTMLDivElement, LoadingFallbackProps>(
                 key={i}
                 className="w-2.5 h-2.5 rounded-full bg-green-500"
                 style={{
-                  animation: `bounce 1.4s ease-in-out infinite`,
+                  animation: `bounce-custom 1.4s ease-in-out infinite`,
                   animationDelay: `${delay}s`,
                 }}
               />
@@ -143,11 +143,7 @@ const LoadingFallback = React.forwardRef<HTMLDivElement, LoadingFallbackProps>(
   },
 );
 
-LoadingFallback.displayName = "LoadingFallback";
+LoadingPage.displayName = "LoadingPage";
 
-// ── Alias for backward compatibility ─────────────────────────────────────────
-
-export const LoadingPage = LoadingFallback;
-
-export { LoadingFallback };
-export default LoadingFallback;
+export { LoadingPage };
+export default LoadingPage;

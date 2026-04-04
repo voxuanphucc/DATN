@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { changeRoleService } from '../../services/change-role';
-import { changeRoleSchema, type ChangeRoleFormValues } from '../../lib/schemas/team.schemas';
+import { changeRoleSchema, type ChangeRoleFormValues } from '../../lib/schemas/team.schema';
 import { Member, MemberRole } from '../../types/team';
 
 interface UseChangeRoleProps {

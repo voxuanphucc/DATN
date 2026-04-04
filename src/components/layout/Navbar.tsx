@@ -106,7 +106,13 @@ export function Navbar({
   const backgroundImage = backgroundImageOverride ?? config.backgroundImage;
 
   useEffect(() => {
+    // Reset mount animation
     const t = setTimeout(() => setMounted(true), 100);
+    
+    // Reset scroll state when component mounts
+    setScrolled(false);
+    setScrollY(0);
+    
     return () => clearTimeout(t);
   }, []);
 
@@ -173,9 +179,9 @@ export function Navbar({
               }}
             />
             <span
-              className={`font-roboto font-black leading-none transition-all duration-500 whitespace-nowrap ${
-                scrolled ? "text-[26px] text-[#E8C840]" : "text-[38px] text-[#FDFFDD]"
-              }`}
+              className={`font-prompt font-extrabold leading-none transition-all duration-500 ${
+                scrolled ? "text-[28px]" : "text-[38px]"
+              } ${scrolled ? "text-dark-olive" : "text-light-yellow-2"}`}
             >
               FarmerAI
             </span>
@@ -194,10 +200,10 @@ export function Navbar({
                 }}
               >
                 <span
-                  className={`font-roboto text-[16px] font-black leading-none transition-colors duration-500 ${
+                  className={`font-roboto text-[16px] font-medium leading-none transition-colors duration-500 ${
                     scrolled
-                      ? "text-[#2D3A1E] group-hover:text-[#E8C840]"
-                      : "text-[#FDFFDD] group-hover:text-[#FFFFFF]"
+                      ? "text-dark-olive group-hover:text-cta-yellow"
+                      : "text-light-yellow-1 group-hover:text-cta-yellow"
                   }`}
                 >
                   {item}
@@ -205,8 +211,8 @@ export function Navbar({
                 <ChevronDownIcon
                   className={`w-5 h-5 transition-colors duration-500 ${
                     scrolled
-                      ? "text-[#2D3A1E] group-hover:text-[#E8C840]"
-                      : "text-[#FDFFDD] group-hover:text-[#FFFFFF]"
+                      ? "text-dark-olive group-hover:text-cta-yellow"
+                      : "text-light-yellow-1 group-hover:text-cta-yellow"
                   }`}
                 />
               </a>
@@ -224,12 +230,12 @@ export function Navbar({
                   className={`flex items-center gap-2 h-12 px-4 rounded-xl border ${
                     scrolled
                       ? "border-gray-300 bg-gray-50"
-                      : "border-[#FDFFDD] bg-white/5"
+                      : "border-light-yellow-1 bg-white/5"
                   }`}
                 >
                   <span
                     className={`font-roboto text-[14px] font-medium leading-none ${
-                      scrolled ? "text-gray-800" : "text-[#FDFFDD]"
+                      scrolled ? "text-gray-800" : "text-light-yellow-1"
                     }`}
                   >
                     {user?.fullName || user?.email || "User"}

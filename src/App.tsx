@@ -24,6 +24,11 @@ export function App() {
   const [isSplash, setIsSplash] = useState(true);
   const isPageLoading = useUiStore(selectIsPageLoading);
 
+  // Reset scroll position on app mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsSplash(false), 500);
     return () => clearTimeout(timer);
