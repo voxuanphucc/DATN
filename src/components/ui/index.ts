@@ -20,6 +20,9 @@ export * from "./input";
 // Label
 export * from "./label";
 
+// Progress
+export * from "./progress";
+
 // Select
 export * from "./select";
 

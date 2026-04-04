@@ -13,6 +13,8 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@import "./styles/theme.css";
+
 /* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
 
 :root {

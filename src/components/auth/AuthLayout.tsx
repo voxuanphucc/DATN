@@ -17,7 +17,7 @@ export function AuthLayout({
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-full flex bg-background overflow-hidden">
+    <div className="h-screen w-full flex bg-white overflow-hidden">
       <style>{`
         .form-shadow {
           box-shadow: 0 12px 32px -8px rgba(5, 150, 105, 0.12),

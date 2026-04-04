@@ -7,6 +7,8 @@ import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
 import AcceptInvitationPage from '../pages/acceptInvitation';
 import { PlotManagementPage, PlotMapPage } from '../pages/plot-management';
+import { SoilAnalysisPage, AIAnalysisPage } from '../pages/soil-analysis';
+import TeamManagementPage from '../pages/TeamManagement';
 
 /**
  * Public Routes - Không cần authentication
@@ -50,5 +52,17 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/map',
     element: <PlotMapPage />,
+  },
+  {
+    path: '/soil-analysis',
+    element: <SoilAnalysisPage />,
+  },
+  {
+    path: '/soil-ai-analysis',
+    element: <AIAnalysisPage />,
+  },
+  {
+    path: '/team-management',
+    element: <TeamManagementPage />,
   },
 ];
