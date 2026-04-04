@@ -16,14 +16,18 @@ const buttonVariants = cva(
         "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50",
         destructive:
         "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline"
+        link: "text-primary underline-offset-4 hover:underline",
+        "cta-yellow": "bg-cta-yellow text-[#2D3A1E] font-roboto font-medium text-[18px] hover:bg-opacity-90 shadow-md hover:shadow-lg transition-all",
+        "outline-yellow": "border-[#FDFFDD] border bg-transparent text-[#FDFFDD] hover:bg-white/10",
+        "outline-dark": "border-gray-300 border bg-transparent text-gray-800 hover:bg-gray-100"
       },
       size: {
         default:
         "h-8 gap-1.5 px-2.5 has-[[data-icon=inline-end]]:pr-2 has-[[data-icon=inline-start]]:pl-2",
         xs: "h-6 gap-1 rounded-md px-2 text-xs has-[[data-icon=inline-end]]:pr-1.5 has-[[data-icon=inline-start]]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-md px-2.5 text-[0.8rem] has-[[data-icon=inline-end]]:pr-1.5 has-[[data-icon=inline-start]]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-[[data-icon=inline-end]]:pr-3 has-[[data-icon=inline-start]]:pl-3",
+        md: "h-10 gap-1.5 px-4 text-sm has-[[data-icon=inline-end]]:pr-3 has-[[data-icon=inline-start]]:pl-3",
+        lg: "h-11 gap-2 px-5 has-[[data-icon=inline-end]]:pr-4 has-[[data-icon=inline-start]]:pl-4",
         icon: "size-8",
         "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-7 rounded-md",
@@ -41,13 +45,14 @@ interface ButtonProps extends
   React.ButtonHTMLAttributes<HTMLButtonElement>,
   VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  fullWidth?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, fullWidth = false, ...props }, ref) => {
     if (asChild && React.isValidElement(props.children)) {
       return React.cloneElement(props.children as React.ReactElement<any>, {
-        className: cn(buttonVariants({ variant, size, className }), (props.children as React.ReactElement<any>).props.className),
+        className: cn(buttonVariants({ variant, size, className }), fullWidth && "w-full", (props.children as React.ReactElement<any>).props.className),
       });
     }
     return (
@@ -56,7 +61,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         data-slot="button"
         data-variant={variant}
         data-size={size}
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), fullWidth && "w-full")}
         {...props}
       />
     );

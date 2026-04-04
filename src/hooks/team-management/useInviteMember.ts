@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { inviteMemberService } from '../../services/invite-member';
 import { getProfileService } from '../../services/get-profile';
-import { inviteMemberSchema, type InviteMemberFormValues } from '../../lib/schemas/team.schemas';
+import { inviteMemberSchema, type InviteMemberFormValues } from '../../lib/schemas/team.schema';
 import { Member, MemberRole } from '../../types/team';
 
 interface UseInviteMemberProps {

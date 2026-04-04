@@ -45,9 +45,9 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...initialState,
-accessToken, refreshToken) =>
+
+      setTokens: (accessToken: string, refreshToken: string) =>
         set({
-          user,
           accessToken,
           refreshToken,
           isAuthenticated: true,

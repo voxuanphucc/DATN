@@ -5,7 +5,8 @@ import { RegisterPage } from '../pages/register';
 import { ForgotPasswordPage } from '../pages/forgot-password';
 import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
-import AcceptInvitationPage from '../pages/AcceptInvitation';
+import AcceptInvitationPage from '../pages/acceptInvitation';
+import { PlotManagementPage, PlotMapPage } from '../pages/plot-management';
 
 /**
  * Public Routes - Không cần authentication
@@ -41,5 +42,13 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/accept-invitation',
     element: <AcceptInvitationPage />,
+  },
+  {
+    path: '/plots',
+    element: <PlotManagementPage />,
+  },
+  {
+    path: '/map',
+    element: <PlotMapPage />,
   },
 ];
