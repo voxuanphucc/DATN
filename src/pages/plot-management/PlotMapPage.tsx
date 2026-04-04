@@ -1,5 +1,5 @@
 import { PlotMap } from '@/components/plot-management'
-import { FarmManagementLayout } from '@/layouts'
+import { FarmManagementLayout } from '@/layout'
 
 export function PlotMapPage() {
   return (

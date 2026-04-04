@@ -88,8 +88,16 @@ export function AcceptInvitationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg">{renderContent()}</Card>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <style>{`
+        .invitation-card {
+          background: white;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border-radius: 1rem;
+        }
+      `}</style>
+      <Card className="invitation-card w-full max-w-md">{renderContent()}</Card>
     </div>
   )
 }

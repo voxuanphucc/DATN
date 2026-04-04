@@ -8,7 +8,7 @@ interface FarmManagementLayoutProps {
 
 export function FarmManagementLayout({ children }: FarmManagementLayoutProps) {
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div className="flex h-screen w-full bg-white overflow-hidden">
       <Toaster position="top-right" />
       <FarmManagementSidebar />
       <main className="flex-1 overflow-hidden">{children}</main>

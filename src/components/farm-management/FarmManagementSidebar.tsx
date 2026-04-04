@@ -4,7 +4,7 @@ import { FarmManagementSidebarFooter } from './FarmManagementSidebarFooter'
 
 export function FarmManagementSidebar() {
   return (
-    <aside className="w-64 border-r bg-card flex flex-col">
+    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
       <FarmManagementSidebarHeader />
       <FarmManagementSidebarNav />
       <FarmManagementSidebarFooter />

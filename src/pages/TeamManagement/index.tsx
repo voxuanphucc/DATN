@@ -13,6 +13,7 @@ import {
   TabsTrigger,
 } from '../../components/ui/tabs'
 import { Users, UserPlus, Mail, ShieldCheck } from 'lucide-react'
+import { PageWrapper, PageHeader, PageContent } from '@/components/layout/PageWrapper'
 import {
   MemberList,
   PendingInvitations,
@@ -110,76 +111,104 @@ export function TeamManagementPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Quản lý thành viên
-          </h1>
-          <p className="text-muted-foreground mt-1">Trang trại Hoa Hồng</p>
+    <PageWrapper variant="default">
+      <PageHeader
+        title="Quản lý thành viên"
+        subtitle="Trang trại Hoa Hồng"
+        icon={<Users className="w-6 h-6 text-gray-700" />}
+        action={
+          <Button 
+            onClick={() => setIsInviteOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Mời thành viên
+          </Button>
+        }
+      />
+      <PageContent>
+        <style>{`
+          .team-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+          }
+          
+          .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 150ms;
+          }
+          
+          .stat-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+          }
+        `}</style>
+        <div className="team-stats">
+          <Card className="stat-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Tổng thành viên
+              </CardTitle>
+              <Users className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{members.length}</div>
+            </CardContent>
+          </Card>
+          <Card className="stat-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Đang hoạt động
+              </CardTitle>
+              <ShieldCheck className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{activeMembersCount}</div>
+            </CardContent>
+          </Card>
+          <Card className="stat-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Lời mời đang chờ
+              </CardTitle>
+              <Mail className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-gray-900">{pendingInvitesCount}</div>
+            </CardContent>
+          </Card>
         </div>
-        <Button onClick={() => setIsInviteOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Mời thành viên
-        </Button>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tổng thành viên
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{members.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Đang hoạt động
-            </CardTitle>
-            <ShieldCheck className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeMembersCount}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Lời mời đang chờ
-            </CardTitle>
-            <Mail className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingInvitesCount}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="members" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="members">Thành viên</TabsTrigger>
-          <TabsTrigger value="invitations">Lời mời đang chờ</TabsTrigger>
-        </TabsList>
-        <TabsContent value="members" className="space-y-4">
-          <MemberList
-            members={members}
-            onChangeRoleClick={setSelectedMemberForRole}
-            onRemoveClick={setSelectedMemberForRemove}
-          />
-        </TabsContent>
-        <TabsContent value="invitations" className="space-y-4">
-          <PendingInvitations
-            invitations={invitations}
-            onCancelInvitation={handleCancelInvitation}
-            onResendInvitation={handleResendInvitation}
-          />
-        </TabsContent>
-      </Tabs>
+        <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+          <Tabs defaultValue="members" className="w-full">
+            <TabsList className="mb-4 bg-gray-50">
+              <TabsTrigger value="members">Thành viên</TabsTrigger>
+              <TabsTrigger value="invitations">Lời mời đang chờ</TabsTrigger>
+            </TabsList>
+            <TabsContent value="members" className="space-y-4">
+              <MemberList
+                members={members}
+                onChangeRoleClick={setSelectedMemberForRole}
+                onRemoveClick={setSelectedMemberForRemove}
+              />
+            </TabsContent>
+            <TabsContent value="invitations" className="space-y-4">
+              <PendingInvitations
+                invitations={invitations}
+                onCancelInvitation={handleCancelInvitation}
+                onResendInvitation={handleResendInvitation}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </PageContent>
 
       <InviteDialog
         open={isInviteOpen}
@@ -202,7 +231,7 @@ export function TeamManagementPage() {
         onRemove={handleRemoveMember}
         tasks={tasks}
       />
-    </div>
+    </PageWrapper>
   )
 }
 
