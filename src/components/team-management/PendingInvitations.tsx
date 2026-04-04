@@ -42,8 +42,6 @@ export function PendingInvitations({
         return 'Quản lý'
       case 'employee':
         return 'Nhân viên'
-      case 'accountant':
-        return 'Kế toán'
       default:
         return role
     }

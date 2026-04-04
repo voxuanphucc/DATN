@@ -15,7 +15,6 @@ export function getRoleLabel(role: Role): string {
     farmer: 'Nông dân',
     manager: 'Quản lý',
     employee: 'Nhân viên',
-    accountant: 'Kế toán',
   };
   return labels[role] ?? role;
 }

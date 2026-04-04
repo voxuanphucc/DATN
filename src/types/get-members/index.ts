@@ -6,7 +6,7 @@ export interface MemberDto {
   id: string;
   name: string;
   email: string;
-  role: 'owner' | 'manager' | 'employee' | 'accountant';
+  role: 'owner' | 'manager' | 'employee';
   status: 'active' | 'pending' | 'rejected';
   avatar?: string;
   joinedAt: string;

@@ -59,15 +59,6 @@ export function MemberList({
             Nhân viên
           </Badge>
         )
-      case 'accountant':
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-orange-100 text-orange-800 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-300"
-          >
-            Kế toán
-          </Badge>
-        )
     }
   }
 

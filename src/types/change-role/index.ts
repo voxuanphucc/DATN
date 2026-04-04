@@ -6,7 +6,7 @@ import { type MemberDto } from '../get-members';
 
 export interface ChangeRoleRequest {
   memberId: string;
-  newRole: 'manager' | 'employee' | 'accountant';
+  newRole: 'manager' | 'employee';
 }
 
 export interface ChangeRoleResponse {

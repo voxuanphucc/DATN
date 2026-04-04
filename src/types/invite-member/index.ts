@@ -7,7 +7,7 @@ import { type InvitationDto } from '../get-invitations';
 
 export interface InviteMemberRequest {
   email: string;
-  role: 'manager' | 'employee' | 'accountant';
+  role: 'manager' | 'employee';
 }
 
 export interface InviteMemberResponse {

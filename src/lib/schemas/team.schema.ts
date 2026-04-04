@@ -13,7 +13,7 @@ export const inviteMemberSchema = z.object({
     .min(1, 'Email không được để trống')
     .email('Định dạng email không hợp lệ'),
   role: z
-    .enum(['manager', 'employee', 'accountant'] as const, {
+    .enum(['manager', 'employee'] as const, {
       errorMap: () => ({ message: 'Vui lòng chọn một vai trò hợp lệ' }),
     }),
 });
@@ -23,7 +23,7 @@ export type InviteMemberFormValues = z.infer<typeof inviteMemberSchema>;
 // ─── Change Role ─────────────────────────────────────────────────────────────
 export const changeRoleSchema = z.object({
   role: z
-    .enum(['manager', 'employee', 'accountant'] as const, {
+    .enum(['manager', 'employee'] as const, {
       errorMap: () => ({ message: 'Vui lòng chọn một vai trò hợp lệ' }),
     }),
 });

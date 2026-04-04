@@ -32,15 +32,6 @@ export const mockMembers: Member[] = [
   },
   {
     id: 'm4',
-    name: 'Phạm Thị Dung',
-    email: 'dung.pham@example.com',
-    role: 'accountant',
-    status: 'active',
-    avatar: 'https://i.pravatar.cc/150?u=m4',
-    joinedAt: '2023-04-05T14:20:00Z',
-  },
-  {
-    id: 'm5',
     name: 'Hoàng Văn Em',
     email: 'em.hoang@example.com',
     role: 'employee',

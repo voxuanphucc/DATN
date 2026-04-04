@@ -110,7 +110,6 @@ export function InviteDialog({
               <SelectContent>
                 <SelectItem value="manager">Quản lý</SelectItem>
                 <SelectItem value="employee">Nhân viên</SelectItem>
-                <SelectItem value="accountant">Kế toán</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (

@@ -51,7 +51,7 @@ export function ChangeRoleDialog({
   const roleValue = watch('role')
 
   const isDowngradingManager =
-    member?.role === 'manager' && (roleValue === 'employee' || roleValue === 'accountant')
+    member?.role === 'manager' && roleValue === 'employee'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,7 +95,6 @@ export function ChangeRoleDialog({
               <SelectContent>
                 <SelectItem value="manager">Quản lý</SelectItem>
                 <SelectItem value="employee">Nhân viên</SelectItem>
-                <SelectItem value="accountant">Kế toán</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (
