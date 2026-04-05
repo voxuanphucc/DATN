@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type ForgotPasswordRequest, type ForgotPasswordResponse } from '../../types/forgot-password';
-import { type ApiResponse } from '../../types/common';
+import { type ForgotPasswordRequest, type ForgotPasswordResponse, type ApiResponse } from '../../types';
 
 class ForgotPasswordService {
   async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<ForgotPasswordResponse>> {

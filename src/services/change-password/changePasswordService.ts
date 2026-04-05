@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type ChangePasswordRequest, type ChangePasswordResponse } from '../../types/change-password';
-import { type ApiResponse } from '../../types/common';
+import { type ChangePasswordRequest, type ChangePasswordResponse, type ApiResponse } from '../../types';
 
 class ChangePasswordService {
   async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<ChangePasswordResponse>> {

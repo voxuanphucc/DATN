@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { inviteMemberService } from '../../services/invite-member';
 import { getProfileService } from '../../services/get-profile';
-import { inviteMemberSchema, type InviteMemberFormValues } from '../../lib/schemas/team.schema';
+import { inviteMemberSchema, type InviteMemberFormValues } from '../../lib/schemas/team.schemas';
 import { Member, MemberRole } from '../../types/team';
 
 interface UseInviteMemberProps {
@@ -84,9 +84,9 @@ export function useInviteMember({ existingMembers, onInviteSuccess }: UseInviteM
         // Reset form
         form.reset();
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorMessage = (error as any).response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
       setServerError(errorMessage);
     } finally {
       setIsLoading(false);

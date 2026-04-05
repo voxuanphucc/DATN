@@ -43,6 +43,7 @@ export interface User {
 }
 
 // Ngưỡng cảnh báo theo spec PB08
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const THRESHOLDS = {
   pH: { min: 4.0, max: 8.5 },
   nitrogen: { min: 0, max: 500 },

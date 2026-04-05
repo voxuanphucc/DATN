@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type UploadAvatarResponse } from '../../types/upload-avatar';
-import { type ApiResponse } from '../../types/common';
+import { type UploadAvatarResponse, type ApiResponse } from '../../types';
 
 class UploadAvatarService {
   async uploadAvatar(file: File): Promise<ApiResponse<UploadAvatarResponse>> {

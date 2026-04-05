@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type InviteMemberRequest, type InviteMemberResponse } from '../../types/invite-member';
-import { type ApiResponse } from '../../types/common';
+import { type InviteMemberRequest, type InviteMemberResponse, type ApiResponse } from '../../types';
 
 class InviteMemberService {
   async inviteMember(data: InviteMemberRequest): Promise<ApiResponse<InviteMemberResponse>> {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { changeRoleService } from '../../services/change-role';
-import { changeRoleSchema, type ChangeRoleFormValues } from '../../lib/schemas/team.schema';
+import { changeRoleSchema, type ChangeRoleFormValues } from '../../lib/schemas/team.schemas';
 import { Member, MemberRole } from '../../types/team';
 
 interface UseChangeRoleProps {
@@ -25,6 +25,7 @@ export function useChangeRole({ member, onChangeRoleSuccess }: UseChangeRoleProp
   const form = useForm<ChangeRoleFormValues>({
     resolver: zodResolver(changeRoleSchema),
     defaultValues: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       role: (member?.role !== 'owner' ? member?.role : undefined) as any,
     },
   });
@@ -33,6 +34,7 @@ export function useChangeRole({ member, onChangeRoleSuccess }: UseChangeRoleProp
   useEffect(() => {
     if (member && member.role !== 'owner') {
       form.reset({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         role: member.role as any,
       });
     }
@@ -64,9 +66,9 @@ export function useChangeRole({ member, onChangeRoleSuccess }: UseChangeRoleProp
         // Reset to current state
         form.reset();
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorMessage = (error as any).response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
       setServerError(errorMessage);
     } finally {
       setIsLoading(false);

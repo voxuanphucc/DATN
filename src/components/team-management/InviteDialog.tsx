@@ -19,7 +19,7 @@ import { MemberRole, Member } from '../../types/team'
 import { Alert, AlertDescription } from '../ui/alert'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { useInviteMember } from '../../hooks/team-management/useInviteMember'
-import { Input } from '../ui/Input'
+import { Input } from '../ui/input'
 import { toast } from 'sonner'
 
 interface InviteDialogProps {
@@ -91,7 +91,7 @@ export function InviteDialog({
               type="email"
               placeholder="nhanvien@example.com"
               disabled={isSubmitting}
-              aria-invalid={!!errors.email || isDuplicateEmail}
+              aria-invalid={!!(errors.email || isDuplicateEmail)}
               {...register('email')}
             />
             {isDuplicateEmail && !errors.email && (
@@ -109,7 +109,7 @@ export function InviteDialog({
             <Label htmlFor="role">Vai trò</Label>
             <Select
               value={roleValue || ''}
-              onValueChange={(value) => form.setValue('role', value as any)}
+              onValueChange={(value) => form.setValue('role', value as 'manager' | 'employee')}
               disabled={isSubmitting}
             >
               <SelectTrigger

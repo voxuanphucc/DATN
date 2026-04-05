@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { User, SoilRecord, Plot } from '@/types'
+import { User, SoilRecord } from '@/types'
 
 // Cấu trúc gợi ý cây trồng từ AI
 interface AISuggestion {
@@ -41,7 +41,6 @@ import { toast } from 'sonner'
 
 interface AIAnalysisViewProps {
   user: User
-  plots: Plot[]
   onSaveExtractedData: (data: Partial<SoilRecord>) => void
 }
 
@@ -55,7 +54,6 @@ type UploadState =
 
 export function AIAnalysisView({
   user,
-  plots: _plots,
   onSaveExtractedData,
 }: AIAnalysisViewProps) {
   const [uploadState, setUploadState] = useState<UploadState>('idle')

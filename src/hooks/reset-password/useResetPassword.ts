@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordService } from '../../services/reset-password';
-import { resetPasswordSchema, type ResetPasswordFormValues } from '../../lib/schemas/auth.schemas';
+import { resetPasswordSchema, type ResetPasswordFormValues } from '../../lib/schemas/auth';
 
 /**
  * useResetPassword Hook
@@ -49,9 +49,9 @@ export function useResetPassword() {
         // Redirect đến login sau 2 giây
         setTimeout(() => navigate('/login'), 2000);
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error?.message ||
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorMessage = (error as any).response?.data?.error?.message ||
         'Đã có lỗi xảy ra. Token có thể đã hết hạn. Vui lòng yêu cầu link mới.';
       setServerError(errorMessage);
     } finally {

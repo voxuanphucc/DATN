@@ -1,4 +1,4 @@
-import { type ApiError } from '../../types/common';
+import { type ApiError } from '../../types';
 
 /**
  * Error Handling Utilities

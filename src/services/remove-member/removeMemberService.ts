@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type RemoveMemberRequest, type RemoveMemberResponse } from '../../types/remove-member';
-import { type ApiResponse } from '../../types/common';
+import { type RemoveMemberRequest, type RemoveMemberResponse, type ApiResponse } from '../../types';
 
 class RemoveMemberService {
   async removeMember(data: RemoveMemberRequest): Promise<ApiResponse<RemoveMemberResponse>> {

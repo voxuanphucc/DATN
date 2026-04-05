@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type ResetPasswordRequest, type ResetPasswordResponse } from '../../types/reset-password';
-import { type ApiResponse } from '../../types/common';
+import { type ResetPasswordRequest, type ResetPasswordResponse, type ApiResponse } from '../../types';
 
 class ResetPasswordService {
   async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<ResetPasswordResponse>> {

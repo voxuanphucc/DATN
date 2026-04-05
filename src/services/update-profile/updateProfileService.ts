@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type UpdateProfileRequest, type UpdateProfileResponse } from '../../types/update-profile';
-import { type ApiResponse } from '../../types/common';
+import { type UpdateProfileRequest, type UpdateProfileResponse, type ApiResponse } from '../../types';
 
 class UpdateProfileService {
   async updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<UpdateProfileResponse>> {

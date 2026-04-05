@@ -10,7 +10,9 @@ import paddyintro from "../../../assets/paddy-intro.png";
 import LogoIntro from "../../../assets/Logo-intro.png";
 
 // HOC to inject useNavigate hook
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const withNavigation = (Component: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (props: any) => {
     const navigate = useNavigate();
     return <Component {...props} navigate={navigate} />;
@@ -163,4 +165,5 @@ class HeroSection extends React.Component<HeroSectionProps, HeroSectionState> {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default withNavigation(HeroSection);

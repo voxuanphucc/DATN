@@ -83,7 +83,7 @@ export function ChangeRoleDialog({
             <Label htmlFor="new-role">Vai trò mới</Label>
             <Select
               value={roleValue || ''}
-              onValueChange={(value) => form.setValue('role', value as any)}
+              onValueChange={(value) => form.setValue('role', value as 'manager' | 'employee')}
               disabled={isSubmitting}
             >
               <SelectTrigger

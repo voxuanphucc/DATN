@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type LoginRequest, type LoginResponse } from '../../types/login';
-import { type ApiResponse } from '../../types/common';
+import { type LoginRequest, type LoginResponse, type ApiResponse } from '../../types';
 
 class LoginService {
   async login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {

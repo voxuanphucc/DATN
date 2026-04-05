@@ -1,6 +1,6 @@
 import React from "react";
 import { BotIcon, CloudSunIcon, BarChart2Icon, LeafIcon } from "lucide-react";
-import { useReveal } from "@/components/hooks/useReveal";
+import { useReveal } from "@/hooks/useReveal";
 
 const services = [
   {
@@ -100,4 +100,5 @@ class ServicesSection extends React.Component<ServicesSectionProps> {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default withReveal(ServicesSection);

@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type GetInvitationsResponse } from '../../types/get-invitations';
-import { type ApiResponse, type PaginationParams } from '../../types/common';
+import { type GetInvitationsResponse, type ApiResponse, type PaginationParams } from '../../types';
 
 class GetInvitationsService {
   async getInvitations(params?: PaginationParams): Promise<ApiResponse<GetInvitationsResponse>> {

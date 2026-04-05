@@ -47,9 +47,6 @@ export function PlotManagement() {
   const [deletingPlot, setDeletingPlot] = useState<Plot | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // isLoading sẽ được quản lý bởi API call khi backend sẵn sàng
-  const [isLoading, _setIsLoading] = useState(false)
-
   const filteredPlots = useMemo(() => {
     return plots.filter((plot) => {
       const matchesSearch = plot.name

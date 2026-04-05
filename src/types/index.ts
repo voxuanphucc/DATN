@@ -1,17 +1,20 @@
 /**
+ * ════════════════════════════════════════════════════════════════════════════
  * Central Types Export
  * All API types organized by feature
+ * ════════════════════════════════════════════════════════════════════════════
+ * 
+ * ✅ Types are inferred from Zod schemas in src/lib/schemas/
+ * Single source of truth: schemas define both validation AND types
  */
-
-// Common Types
-// export * from './common'; // TODO: Create common types file
 
 // Soil Records & Analysis
 export * from './soil-records';
 
-// Authentication
-export * from './login';
-export * from './register';
+// Authentication - Organized by feature folder
+export * from './auth';
+
+// Form-related types (kept for backward compatibility)
 export * from './email-verification';
 export * from './forgot-password';
 export * from './reset-password';

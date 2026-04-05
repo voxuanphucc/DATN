@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPasswordService } from '../../services/forgot-password';
-import { forgotPasswordSchema, type ForgotPasswordFormValues } from '../../lib/schemas/auth.schemas';
+import { forgotPasswordSchema, type ForgotPasswordFormValues } from '../../lib/schemas/auth';
 
 /**
  * useForgotPassword Hook
@@ -34,9 +34,9 @@ export function useForgotPassword() {
         setIsSuccess(true);
         setResetEmail(data.email);
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error?.message ||
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errorMessage = (error as any).response?.data?.error?.message ||
         'Đã có lỗi xảy ra. Vui lòng kiểm tra email của bạn.';
       setServerError(errorMessage);
     } finally {

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
-import { registerSchema, type RegisterFormValues } from '../../lib/schemas/auth.schemas';
+import { registerSchema, type RegisterFormValues } from '../../lib/schemas/auth';
+import { registerService } from '../../services/auth/register';
 
 /**
  * useRegister Hook
  * Xử lý logic đăng ký tài khoản (Spec PB01)
- * - Validation form: fullName, email, farmName (tùy chọn), password, confirmPassword
- * - Gọi API register → tạo tài khoản pending
+ * - Validation form: fullName, email, password, confirmPassword
+ * - Gọi registerService → tạo tài khoản pending
  * - Hệ thống gửi email xác thực (token 24h)
  */
 export function useRegister() {
@@ -19,11 +19,9 @@ export function useRegister() {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: '',
       email: '',
-      farmName: '',
       password: '',
-      confirmPassword: '',
+      fullName: '',
     },
   });
 
@@ -32,35 +30,36 @@ export function useRegister() {
     setIsLoading(true);
 
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
-      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
-        fullName: data.fullName,
+      // Use registerService instead of raw axios
+      const response = await registerService.register({
         email: data.email,
-        farmName: data.farmName || undefined,
         password: data.password,
+        fullName: data.fullName,
       });
-
-      const registerResponse = response.data;
-      if (registerResponse.success) {
+      if (response.success) {
         setIsSuccess(true);
       } else {
-        setServerError(registerResponse.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+        setServerError(response.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
       }
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        const msg =
-          error.response?.data?.message ||
-          error.response?.data?.error?.message;
-
-        if (status === 409 || (msg && msg.toLowerCase().includes('email'))) {
-          setServerError('Email đã được sử dụng. Vui lòng dùng email khác.');
-        } else {
-          setServerError(msg || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
-        }
-      } else {
-        setServerError(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
-      }
+    } catch (error) {
+      const axiosError = error as { 
+        message?: string; 
+        code?: string; 
+        response?: { data?: { message?: string } } 
+      };
+      
+      // Phân biệt timeout vs các lỗi khác
+      const isTimeout = 
+        axiosError.message?.includes('timeout') || 
+        axiosError.code === 'ECONNABORTED';
+      
+      const errorMessage = isTimeout 
+        ? 'Kết nối timed out. Server đang khởi động, vui lòng thử lại sau 1-2 phút.'
+        : (axiosError.response?.data?.message || 
+           axiosError.message || 
+           'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      
+      setServerError(errorMessage);
       console.error('❌ Lỗi đăng ký:', error);
     } finally {
       setIsLoading(false);

@@ -1,30 +1,36 @@
 import axios, { AxiosInstance } from 'axios';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/slices';
+import { refreshTokenService } from '@/services/auth/refresh';
 
 /**
+ * ════════════════════════════════════════════════════════════════════════════
  * Axios Instance Configuration
+ * ════════════════════════════════════════════════════════════════════════════
  * 
- * Base URL: API_BASE_URL từ environment hoặc default http://localhost:3001/api
+ * Base URL: VITE_API_BASE_URL từ .env hoặc default
  * 
- * Interceptors:
- * - Request: Tự động thêm Authorization header với token từ auth store
- * - Response: Xử lý error responses, refresh token nếu cần
+ * Request Interceptor:
+ * - Tự động thêm Authorization header với access token
+ * 
+ * Response Interceptor:
+ * - Xử lý 401 Unauthorized → refresh token → retry request
+ * - Xử lý 403 Forbidden → redirect to forbidden page
+ * - Handle other errors
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: 30000, // 30 seconds (tăng lên 120000 nếu cần cho Render.com cold start)
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // ─── Request Interceptor ────────────────────────────────────────────────────
-
 /**
- * Tự động thêm access token vào request headers
+ * Tự động thêm access token vào Authorization header
  * nếu user đã đăng nhập
  */
 axiosInstance.interceptors.request.use(
@@ -37,16 +43,15 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // ─── Response Interceptor ───────────────────────────────────────────────────
-
 /**
  * Xử lý các lỗi response:
- * - 401: Token expired → refresh hoặc logout
+ * - 401: Token expired → refresh token → retry request
  * - 403: Forbidden → redirect to forbidden page
- * - 500: Server error → show error message
+ * - 500: Server error
  */
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -55,34 +60,46 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 Unauthorized - Token expired
+    // 401 Unauthorized - Token expired hoặc invalid
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const { refreshToken } = useAuthStore.getState();
+        const { refreshToken, setAccessToken, setRefreshToken, logout } = useAuthStore.getState();
 
+        // Nếu không có refresh token → logout
         if (!refreshToken) {
-          // Không có refresh token → logout
-          useAuthStore.getState().logout();
+          logout();
           window.location.href = '/login';
           return Promise.reject(error);
         }
 
-        // Gọi refresh token API
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-          refreshToken,
-        });
+        // Nếu đang retry và vẫn không có token → không try lại
+        if (originalRequest._retryCount >= 1) {
+          logout();
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
 
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.data;
+        // Gọi API refresh token
+        const response = await refreshTokenService.refresh({ refreshToken });
 
-        // Cập nhật tokens
-        useAuthStore.getState().setAccessToken(newAccessToken);
-        useAuthStore.getState().setRefreshToken(newRefreshToken);
+        if (response.data?.accessToken && response.data?.refreshToken) {
+          // Cập nhật tokens trong store
+          setAccessToken(response.data.accessToken);
+          setRefreshToken(response.data.refreshToken);
 
-        // Retry original request với token mới
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axiosInstance(originalRequest);
+          // Retry original request với token mới
+          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+          originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+          
+          return axiosInstance(originalRequest);
+        } else {
+          // Response không có tokens → logout
+          logout();
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
       } catch (refreshError) {
         // Refresh token failed → logout
         useAuthStore.getState().logout();
@@ -91,13 +108,18 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    // 403 Forbidden - Access denied
+    // 403 Forbidden - Access denied (chỉ redirect nếu user đã authenticate)
     if (error.response?.status === 403) {
-      window.location.href = '/forbidden';
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        window.location.href = '/forbidden';
+      }
+      return Promise.reject(error);
     }
 
+    // Để các error khác được handle bởi component
     return Promise.reject(error);
-  },
+  }
 );
 
 export default axiosInstance;

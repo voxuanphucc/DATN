@@ -1,30 +1,22 @@
 import { Plus, Minus, Maximize2, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui'
-import { useMap } from 'react-leaflet'
-import { LatLngExpression } from 'leaflet'
 
-const DEFAULT_CENTER: LatLngExpression = [16.0544, 108.2022]
-const DEFAULT_ZOOM = 14
+// Legacy Leaflet component - kept for reference but not used
+// Project uses Google Maps API (@react-google-maps/api) instead
+// Map controls are integrated into PlotMap component with Google Maps
 
 export function MapControls() {
-  const map = useMap()
-
-  const handleZoomIn = () => map.zoomIn()
-  const handleZoomOut = () => map.zoomOut()
-  const handleReset = () => {
-    map.setView(DEFAULT_CENTER, DEFAULT_ZOOM)
-  }
-
+  // Placeholder - map controls are now integrated in PlotMap component with Google Maps
   return (
     <>
       <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-        <Button variant="outline" size="icon" onClick={handleZoomIn}>
+        <Button variant="outline" size="icon" disabled>
           <Plus className="w-4 h-4" />
         </Button>
-        <Button variant="outline" size="icon" onClick={handleZoomOut}>
+        <Button variant="outline" size="icon" disabled>
           <Minus className="w-4 h-4" />
         </Button>
-        <Button variant="outline" size="icon" onClick={handleReset}>
+        <Button variant="outline" size="icon" disabled>
           <RotateCcw className="w-4 h-4" />
         </Button>
       </div>

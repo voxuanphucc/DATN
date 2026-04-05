@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type GetMembersResponse, type MemberDto } from '../../types/get-members';
-import { type ApiResponse, type PaginationParams } from '../../types/common';
+import { type GetMembersResponse, type MemberDto, type ApiResponse, type PaginationParams } from '../../types';
 
 class GetMembersService {
   async getMembers(params?: PaginationParams): Promise<ApiResponse<GetMembersResponse>> {

@@ -17,6 +17,8 @@ interface AuthActions {
   login: (user: UserProfileDto, accessToken: string, refreshToken: string) => void;
   /** Đăng xuất: xóa toàn bộ auth state */
   logout: () => void;
+  /** Cập nhật cả hai tokens (access + refresh) */
+  setTokens: (accessToken: string, refreshToken: string) => void;
   /** Cập nhật thông tin user (dùng khi refresh profile) */
   setUser: (user: UserProfileDto | null) => void;
   /** Cập nhật access token (dùng khi refresh token) */

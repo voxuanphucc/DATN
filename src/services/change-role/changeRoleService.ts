@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type ChangeRoleRequest, type ChangeRoleResponse } from '../../types/change-role';
-import { type ApiResponse } from '../../types/common';
+import { type ChangeRoleRequest, type ChangeRoleResponse, type ApiResponse } from '../../types';
 
 class ChangeRoleService {
   async changeRole(data: ChangeRoleRequest): Promise<ApiResponse<ChangeRoleResponse>> {

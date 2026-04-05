@@ -7,8 +7,7 @@ import {
   type AcceptInvitationRequest,
   type AcceptInvitationResponse,
 } from '../../types/accept-invitation';
-import { type InvitationDto } from '../../types/get-invitations';
-import { type ApiResponse } from '../../types/common';
+import { type InvitationDto, type ApiResponse } from '../../types';
 
 class AcceptInvitationService {
   async acceptInvitation(data: AcceptInvitationRequest): Promise<ApiResponse<AcceptInvitationResponse>> {

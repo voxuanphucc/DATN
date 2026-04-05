@@ -6,8 +6,8 @@ import axiosInstance from '../../config/axios';
 import {
   type EmailVerificationRequest,
   type EmailVerificationResponse,
-} from '../../types/email-verification';
-import { type ApiResponse } from '../../types/common';
+  type ApiResponse,
+} from '../../types';
 
 class EmailVerificationService {
   async verifyEmail(data: EmailVerificationRequest): Promise<ApiResponse<EmailVerificationResponse>> {
@@ -16,8 +16,18 @@ class EmailVerificationService {
   }
 
   async resendVerificationEmail(email: string): Promise<ApiResponse<{ message: string }>> {
-    const response = await axiosInstance.post('/auth/resend-verification', { email });
-    return response.data;
+    try {
+      // Gửi email verification lại bằng cách POST email đến /api/v1/auth/verify
+      const response = await axiosInstance.post('/api/v1/auth/verify', { email });
+      return response.data;
+    } catch (error) {
+      console.error('Resend verification email error:', {
+        status: (error as any)?.response?.status,
+        data: (error as any)?.response?.data,
+        message: (error as any)?.message
+      });
+      throw error;
+    }
   }
 }
 

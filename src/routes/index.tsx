@@ -1,13 +1,15 @@
 import { RouteObject } from 'react-router-dom';
 import { publicRoutes } from './publicRoutes';
-import { privateRoutes } from './privateRoutes';
+import { privateRoutes, PrivateRoute } from './privateRoutes';
 
 /**
  * Combine tất cả routes
- * publicRoutes: Routes không cần authentication (tạm thời)
- * privateRoutes: Routes cần authentication (để trống, sẽ thêm sau)
+ * publicRoutes: Routes không cần authentication
+ * privateRoutes: Routes cần authentication + role-based access
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const appRoutes: RouteObject[] = [...publicRoutes, ...privateRoutes];
 
 // Export từng loại routes để dễ quản lý
-export { publicRoutes, privateRoutes };
+// eslint-disable-next-line react-refresh/only-export-components
+export { publicRoutes, privateRoutes, PrivateRoute };

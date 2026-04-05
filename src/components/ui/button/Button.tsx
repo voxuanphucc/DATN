@@ -51,7 +51,9 @@ interface ButtonProps extends
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "default", asChild = false, fullWidth = false, ...props }, ref) => {
     if (asChild && React.isValidElement(props.children)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return React.cloneElement(props.children as React.ReactElement<any>, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         className: cn(buttonVariants({ variant, size, className }), fullWidth && "w-full", (props.children as React.ReactElement<any>).props.className),
       });
     }
@@ -69,5 +71,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants };
 export type { ButtonProps };

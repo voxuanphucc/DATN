@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
 import { AlertCircle, CheckCircle2, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useRegister } from '../../hooks/register/useRegister';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginBg from '@/assets/login.png';
 import LogoBrowser from '@/assets/Logo-browser.png';
 
@@ -12,11 +12,22 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
-    form: { register, formState: { errors, isSubmitting } },
+    form: { register, formState: { errors, isSubmitting }, getValues },
     serverError,
     isSuccess,
     onSubmit,
   } = useRegister();
+
+  // Auto redirect to verify-email after successful registration
+  useEffect(() => {
+    if (isSuccess) {
+      const timer = setTimeout(() => {
+        const email = getValues('email');
+        navigate('/verify-email', { state: { email } });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, navigate, getValues]);
 
   return (
     <div className="h-screen w-full flex">
@@ -344,16 +355,12 @@ export function RegisterPage() {
                   <div className="success-alert-text">
                     <div className="success-alert-title">Đăng ký thành công!</div>
                     <div className="success-alert-description">
-                      Kiểm tra email của bạn để xác thực tài khoản. Vui lòng nhấp vào liên kết xác nhận để hoàn thành quá trình đăng ký.
+                      Đang chuyển hướng đến trang xác thực email...
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => navigate('/login')}
-                      className="submit-btn"
-                      style={{ marginTop: '1rem', marginBottom: '0.5rem' }}
-                    >
-                      Quay lại đăng nhập
-                    </button>
+                    <div className="flex items-center gap-2 mt-4">
+                      <Loader2 className="h-4 w-4 animate-spin text-green-600" />
+                      <span className="text-sm text-green-700">Vui lòng chờ...</span>
+                    </div>
                   </div>
                 </div>
               </div>

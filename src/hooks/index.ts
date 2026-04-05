@@ -2,6 +2,7 @@
 export { useAsync } from './common/useAsync';
 export { useFetch } from './common/useFetch';
 export { useApiMutation } from './common/useApiMutation';
+export { useReveal } from './useReveal';
 
 // Auth Hooks
 export { useLogin } from './login/useLogin';

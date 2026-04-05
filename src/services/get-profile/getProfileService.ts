@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type UserProfileDto } from '../../types/get-profile';
-import { type ApiResponse } from '../../types/common';
+import { type UserProfileDto, type ApiResponse } from '../../types';
 
 class GetProfileService {
   async getProfile(): Promise<ApiResponse<UserProfileDto>> {

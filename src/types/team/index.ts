@@ -6,7 +6,7 @@
 // ─── Type Aliases (exported để dùng trong components) ────────────────────────
 export type MemberRole = 'owner' | 'manager' | 'employee'
 export type MemberStatus = 'active' | 'pending' | 'rejected'
-export type InvitationStatus = 'pending' | 'expired' | 'cancelled'
+export type InvitationStatus = 'pending' | 'expired' | 'cancelled' | 'accepted'
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 export interface Member {

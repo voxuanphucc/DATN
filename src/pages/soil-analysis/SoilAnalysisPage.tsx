@@ -162,7 +162,6 @@ export function SoilAnalysisPage() {
               {soilUser ? (
                 <AIAnalysisView
                   user={soilUser}
-                  plots={plots}
                   onSaveExtractedData={handleSaveExtractedData}
                 />
               ) : (

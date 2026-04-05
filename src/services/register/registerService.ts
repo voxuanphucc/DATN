@@ -3,8 +3,7 @@
  */
 
 import axiosInstance from '../../config/axios';
-import { type RegisterRequest, type RegisterResponse } from '../../types/register';
-import { type ApiResponse } from '../../types/common';
+import { type RegisterRequest, type RegisterResponse, type ApiResponse } from '../../types';
 
 class RegisterService {
   async register(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {

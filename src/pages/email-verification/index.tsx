@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useEmailVerification } from '../../hooks/email-verification/useEmailVerification';
 import LoginBg from '@/assets/login.png';
@@ -6,7 +6,9 @@ import LogoBrowser from '@/assets/Logo-browser.png';
 
 export function EmailVerificationPage() {
   const navigate = useNavigate();
-  const { status, isResending, handleResendEmail } = useEmailVerification();
+  const location = useLocation();
+  const emailFromState = (location.state as { email?: string })?.email;
+  const { status, isResending, errorMessage, successMessage, handleResendEmail } = useEmailVerification(emailFromState);
 
   return (
     <div className="h-screen w-full flex">
@@ -231,11 +233,34 @@ export function EmailVerificationPage() {
                 <h1 className="form-title">Xác thực Email</h1>
                 <p className="form-subtitle">Đang kiểm tra thông tin xác thực của bạn...</p>
               </div>
-              <div className="loading-container" style={{ paddingY: '2rem', textAlign: 'center' }}>
-                <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-4" />
-                <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  Đang xác thực email của bạn...
-                </p>
+              <div className="loading-container" style={{ paddingTop: '2rem', paddingBottom: '2rem', textAlign: 'center' }}>
+                {successMessage && (
+                  <div className="success-alert" style={{ marginBottom: '1rem' }}>
+                    <CheckCircle2 className="success-alert-icon h-5 w-5" />
+                    <div className="success-alert-text">{successMessage}</div>
+                  </div>
+                )}
+                {errorMessage ? (
+                  <>
+                    <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-4" />
+                    <p style={{ color: '#059669', fontSize: '0.95rem', fontWeight: '500', marginBottom: '1rem' }}>
+                      {errorMessage}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendEmail}
+                      disabled={isResending}
+                      className="submit-btn"
+                    >
+                      {isResending && <Loader2 className="h-4 w-4 animate-spin" />}
+                      {isResending ? 'Đang gửi...' : 'Gửi lại email xác thực'}
+                    </button>
+                  </>
+                ) : (
+                  <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                    Đang xác thực email của bạn...
+                  </p>
+                )}
               </div>
             </>
           )}

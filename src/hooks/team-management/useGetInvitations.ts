@@ -1,6 +1,6 @@
 import { useFetch } from '../common/useFetch';
 import { getInvitationsService } from '../../services/get-invitations';
-import { type PaginationParams } from '../../types/common';
+import { type PaginationParams } from '../../types';
 
 /**
  * useGetInvitations Hook

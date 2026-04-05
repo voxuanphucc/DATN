@@ -1,6 +1,6 @@
 import { useFetch } from '../common/useFetch';
 import { getMembersService } from '../../services/get-members';
-import { type PaginationParams } from '../../types/common';
+import { type PaginationParams } from '../../types';
 
 /**
  * useGetMembers Hook

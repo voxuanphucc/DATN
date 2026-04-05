@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { changePasswordSchema, type ChangePasswordFormValues } from '../../lib/schemas/auth.schemas';
+import { changePasswordSchema, type ChangePasswordFormValues } from '../../lib/schemas/auth';
 
 /**
  * useChangePassword Hook
@@ -19,7 +19,7 @@ export function useChangePassword() {
     resolver: zodResolver(changePasswordSchema),
   });
 
-  const onSubmit = async (data: ChangePasswordFormValues) => {
+  const onSubmit = async () => {
     setServerError(null);
 
     try {
@@ -40,9 +40,10 @@ export function useChangePassword() {
 
       // Optional: Auto-logout or require re-login
       // window.location.href = '/login';
-    } catch (error: any) {
+    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorMessage =
-        error.response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+        (error as any).response?.data?.error?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
       setServerError(errorMessage);
     }
   };
