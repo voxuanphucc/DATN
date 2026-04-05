@@ -12,7 +12,7 @@ export function LoginPage() {
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
-    isLocked,
+    isLoading,
     onSubmit,
   } = useLogin();
 
@@ -57,7 +57,7 @@ export function LoginPage() {
               id="email"
               type="email"
               placeholder="name@example.com"
-              disabled={isSubmitting || isLocked}
+              disabled={isSubmitting}
               aria-invalid={!!errors.email}
               {...register('email')}
               className="input-field h-11 rounded-lg"
@@ -84,7 +84,7 @@ export function LoginPage() {
             <Input
               id="password"
               type="password"
-              disabled={isSubmitting || isLocked}
+              disabled={isSubmitting}
               aria-invalid={!!errors.password}
               {...register('password')}
               className="input-field h-11 rounded-lg"
@@ -98,7 +98,7 @@ export function LoginPage() {
         {/* Submit Button */}
         <Button
           type="submit"
-          disabled={isSubmitting || isLocked}
+          disabled={isSubmitting}
           className="w-full h-11 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all"
         >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

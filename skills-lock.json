@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "claude-opus-4-5-migration": {
+      "source": "anthropics/claude-code",
+      "sourceType": "github",
+      "computedHash": "b03b91554e25480cd5dfdcb8e1c797a4703b9ed5e303593c9ac338d6d43c040a"
+    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",

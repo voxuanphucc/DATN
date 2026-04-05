@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Plot, SoilRecord, checkThresholds } from '@/data/soil-records'
+import { SoilRecord, Plot, checkThresholds } from '@/types'
 import {
   Dialog,
   DialogContent,

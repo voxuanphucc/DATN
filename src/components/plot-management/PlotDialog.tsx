@@ -25,6 +25,7 @@ interface PlotDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   plot: Plot | null
+  allPlots: Plot[]
   onSave: (
     plotData: Omit<
       Plot,
@@ -37,6 +38,7 @@ export function PlotDialog({
   open,
   onOpenChange,
   plot,
+  allPlots,
   onSave,
 }: PlotDialogProps) {
   const [name, setName] = useState('')
@@ -86,8 +88,11 @@ export function PlotDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
 
+    // Allow submission even with duplicate warning (per PB06 requirement)
     onSave({
       name: name.trim(),
       area: parseFloat(area),
@@ -99,7 +104,12 @@ export function PlotDialog({
 
   const handleNameChange = (value: string) => {
     setName(value)
-    setShowDuplicateWarning(false)
+    // Check if name is duplicate (excluding current plot if editing)
+    const isDuplicate = allPlots.some((p) => 
+      p.name.toLowerCase() === value.toLowerCase() && 
+      p.id !== plot?.id
+    )
+    setShowDuplicateWarning(isDuplicate)
   }
 
   return (

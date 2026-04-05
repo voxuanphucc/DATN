@@ -51,6 +51,12 @@ export function InviteDialog({
   } = form
 
   const roleValue = watch('role')
+  const emailValue = watch('email')
+  
+  // Check if email is already a member (real-time validation)
+  const isDuplicateEmail =
+    emailValue &&
+    existingMembers.some((m) => m.email.toLowerCase() === emailValue.toLowerCase())
 
   return (
     <Dialog
@@ -85,9 +91,14 @@ export function InviteDialog({
               type="email"
               placeholder="nhanvien@example.com"
               disabled={isSubmitting}
-              aria-invalid={!!errors.email}
+              aria-invalid={!!errors.email || isDuplicateEmail}
               {...register('email')}
             />
+            {isDuplicateEmail && !errors.email && (
+              <p className="text-xs text-amber-600 font-medium">
+                ⚠️ Email này đã là thành viên của trang trại
+              </p>
+            )}
             {errors.email && (
               <p className="text-xs text-destructive">{errors.email.message}</p>
             )}
@@ -126,7 +137,10 @@ export function InviteDialog({
             >
               Hủy
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || isDuplicateEmail || !emailValue}
+            >
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Gửi lời mời
             </Button>

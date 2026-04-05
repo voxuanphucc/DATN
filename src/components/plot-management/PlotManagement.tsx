@@ -28,12 +28,15 @@ import {
 import { PlotDialog } from './PlotDialog'
 import { DeletePlotDialog } from './DeletePlotDialog'
 import { Plot } from '@/types/plot-management'
-import { mockPlots } from '@/data/plots/mockPlots'
 import { toast } from 'sonner'
+import { PlotTableSkeleton, PlotCardSkeleton } from '@/components/skeletons'
+
+// Danh sách lô đất ban đầu (trống) — sẽ fetch từ API khi backend sẵn sàng
+const initialPlots: Plot[] = []
 
 export function PlotManagement() {
   const [plots, setPlots] = useState<Plot[]>(
-    mockPlots.filter((p) => !p.isDeleted),
+    initialPlots.filter((p) => !p.isDeleted),
   )
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<
@@ -43,6 +46,9 @@ export function PlotManagement() {
   const [editingPlot, setEditingPlot] = useState<Plot | null>(null)
   const [deletingPlot, setDeletingPlot] = useState<Plot | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  // isLoading sẽ được quản lý bởi API call khi backend sẵn sàng
+  const [isLoading, _setIsLoading] = useState(false)
 
   const filteredPlots = useMemo(() => {
     return plots.filter((plot) => {
@@ -181,7 +187,13 @@ export function PlotManagement() {
       </div>
 
       <div className="flex-1 overflow-auto p-6">
-        {filteredPlots.length === 0 ? (
+        {isLoading ? (
+          viewMode === 'table' ? (
+            <PlotTableSkeleton />
+          ) : (
+            <PlotCardSkeleton />
+          )
+        ) : filteredPlots.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <p className="text-muted-foreground mb-2">
               Không tìm thấy lô đất nào
@@ -298,6 +310,7 @@ export function PlotManagement() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         plot={editingPlot}
+        allPlots={plots}
         onSave={editingPlot ? handleEditPlot : handleAddPlot}
       />
 

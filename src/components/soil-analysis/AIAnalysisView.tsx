@@ -1,5 +1,18 @@
 import { useState, useRef } from 'react'
-import { User, aiSuggestions, SoilRecord, Plot } from '@/data/soil-records'
+import { User, SoilRecord, Plot } from '@/types'
+
+// Cấu trúc gợi ý cây trồng từ AI
+interface AISuggestion {
+  id: string
+  name: string
+  compatibility: number
+  explanation: string
+  details?: string
+}
+
+// Danh sách gợi ý AI — sẽ được fetch từ API khi backend sẵn sàng
+const aiSuggestions: AISuggestion[] = []
+
 import {
   Card,
   CardContent,
@@ -10,7 +23,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   Alert,
   AlertDescription,
 } from '@/components/ui'
@@ -44,7 +56,7 @@ type UploadState =
 
 export function AIAnalysisView({
   user,
-  plots,
+  plots: _plots,
   onSaveExtractedData,
 }: AIAnalysisViewProps) {
   const [uploadState, setUploadState] = useState<UploadState>('idle')
@@ -127,7 +139,7 @@ export function AIAnalysisView({
     }
   }
 
-  const selectedCropDetails = aiSuggestions.find((c) => c.id === selectedCrop)
+  const selectedCropDetails = aiSuggestions.find((c: AISuggestion) => c.id === selectedCrop)
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -144,10 +156,23 @@ export function AIAnalysisView({
         {/* Upload Section */}
         <Card className="md:col-span-1 h-fit">
           <CardHeader>
-            <CardTitle className="text-lg">Tải lên kết quả</CardTitle>
-            <CardDescription>Hỗ trợ PDF, DOCX (Tối đa 10MB)</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">Tải lên kết quả</CardTitle>
+                <CardDescription>Hỗ trợ PDF, DOCX (Tối đa 10MB)</CardDescription>
+              </div>
+              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                🎭 Demo
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            <Alert className="bg-amber-50 border-amber-200">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800 text-xs">
+                Đây là phiên bản demo. Tính năng AI chưa được tích hợp với hệ thống thực tế.
+              </AlertDescription>
+            </Alert>
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 uploadState === 'idle' || uploadState === 'error'
@@ -276,7 +301,7 @@ export function AIAnalysisView({
                       <FileText className="h-5 w-5 text-blue-600" />
                       Dữ liệu trích xuất
                     </CardTitle>
-                    {user.role === 'farmer' && (
+                    {user.role === 'owner' && (
                       <Button size="sm" onClick={handleSave} className="gap-2">
                         <Save className="h-4 w-4" />
                         Lưu thành hồ sơ
@@ -325,7 +350,7 @@ export function AIAnalysisView({
                   AI Gợi ý cây trồng
                 </h3>
                 <div className="grid gap-4">
-                  {aiSuggestions.map((crop, index) => (
+                  {aiSuggestions.map((crop: AISuggestion, index: number) => (
                     <Card
                       key={crop.id}
                       className={`overflow-hidden ${

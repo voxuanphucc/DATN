@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Card } from '../../components/ui/card'
-import { mockInvitations } from '../../data/mockData'
-import { Invitation } from '../../types/team'
+import type { Invitation } from '../../types/team'
 import {
   LoadingState,
   ValidHasAccountState,
@@ -12,6 +11,7 @@ import {
   SuccessState,
 } from '../../components/accept-invitation'
 import { toast } from 'sonner'
+import axios from 'axios'
 
 type PageState =
   | 'loading'
@@ -21,6 +21,18 @@ type PageState =
   | 'invalid'
   | 'success'
 
+/**
+ * AcceptInvitationPage — Xác nhận lời mời tham gia trang trại (US04/PB04)
+ *
+ * Flow theo spec:
+ * 1. Lấy `token` từ URL query param
+ * 2. Gọi API để xác minh token → trả về trạng thái invitation
+ * 3. Nếu hợp lệ: kiểm tra user đã có tài khoản chưa
+ *    - Có tài khoản → ValidHasAccountState → click "Tham gia" → gọi API join
+ *    - Chưa có → ValidNoAccountState → chuyển đến trang đăng ký
+ * 4. Nếu hết hạn → ExpiredState
+ * 5. Nếu không hợp lệ/bị hủy → InvalidState
+ */
 export function AcceptInvitationPage() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
@@ -28,44 +40,74 @@ export function AcceptInvitationPage() {
   const [invitation, setInvitation] = useState<Invitation | null>(null)
 
   useEffect(() => {
-    // Simulate API call to verify token
-    const verifyToken = () => {
-      setTimeout(() => {
-        if (!token) {
+    const verifyToken = async () => {
+      if (!token) {
+        setState('invalid')
+        return
+      }
+
+      try {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+        const response = await axios.get(`${API_BASE_URL}/invitations/verify`, {
+          params: { token },
+        })
+
+        const data = response.data
+
+        if (!data.success || !data.invitation) {
           setState('invalid')
           return
         }
-        const found = mockInvitations.find((i) => i.token === token)
-        if (!found) {
+
+        const inv: Invitation = data.invitation
+        setInvitation(inv)
+
+        if (inv.status === 'cancelled') {
           setState('invalid')
           return
         }
-        setInvitation(found)
-        if (found.status === 'cancelled') {
-          setState('invalid')
-          return
-        }
-        if (
-          new Date(found.expiresAt) < new Date() ||
-          found.status === 'expired'
-        ) {
+
+        if (new Date(inv.expiresAt) < new Date() || inv.status === 'expired') {
           setState('expired')
           return
         }
-        // Simulate checking if user has an account (randomly assign for demo)
-        const hasAccount = Math.random() > 0.5
+
+        // Kiểm tra user đã có tài khoản (từ API trả về)
+        const hasAccount = data.hasAccount === true
         setState(hasAccount ? 'valid_has_account' : 'valid_no_account')
-      }, 1500)
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          const status = error.response?.status
+          if (status === 404) {
+            setState('invalid')
+          } else if (status === 410) {
+            // 410 Gone = expired
+            setState('expired')
+          } else {
+            setState('invalid')
+          }
+        } else {
+          setState('invalid')
+        }
+      }
     }
+
     verifyToken()
   }, [token])
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
+    if (!token) return
     setState('loading')
-    setTimeout(() => {
+
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      await axios.post(`${API_BASE_URL}/invitations/accept`, { token })
       setState('success')
       toast.success('Tham gia trang trại thành công!')
-    }, 1000)
+    } catch {
+      setState('invalid')
+      toast.error('Không thể tham gia trang trại. Vui lòng thử lại.')
+    }
   }
 
   const renderContent = () => {

@@ -5,16 +5,21 @@ import { RegisterPage } from '../pages/register';
 import { ForgotPasswordPage } from '../pages/forgot-password';
 import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
-import AcceptInvitationPage from '../pages/acceptInvitation';
-import { PlotManagementPage, PlotMapPage } from '../pages/plot-management';
-import { SoilAnalysisPage, AIAnalysisPage } from '../pages/soil-analysis';
-import TeamManagementPage from '../pages/TeamManagement';
+import AcceptInvitationPage from '../pages/AcceptInvitation';
+import { ForbiddenPage } from '../pages/forbidden';
 
 /**
  * Public Routes - Không cần authentication
  * 
- * Các routes cần authentication được move sang privateRoutes.tsx
- * và wrapping bởi <PrivateRoute></PrivateRoute>
+ * Chỉ chứa routes public:
+ * - Landing page
+ * - Login/Register
+ * - Password reset
+ * - Email verification
+ * - Accept invitation (token-based access)
+ * - Forbidden page (for RBAC access denied)
+ * 
+ * Các routes khác được move sang privateRoutes.tsx
  */
 export const publicRoutes: RouteObject[] = [
   {
@@ -46,23 +51,7 @@ export const publicRoutes: RouteObject[] = [
     element: <AcceptInvitationPage />,
   },
   {
-    path: '/plots',
-    element: <PlotManagementPage />,
-  },
-  {
-    path: '/map',
-    element: <PlotMapPage />,
-  },
-  {
-    path: '/soil-analysis',
-    element: <SoilAnalysisPage />,
-  },
-  {
-    path: '/soil-ai-analysis',
-    element: <AIAnalysisPage />,
-  },
-  {
-    path: '/team-management',
-    element: <TeamManagementPage />,
+    path: '/forbidden',
+    element: <ForbiddenPage />,
   },
 ];

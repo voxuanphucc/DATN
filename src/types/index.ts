@@ -4,7 +4,10 @@
  */
 
 // Common Types
-export * from './common';
+// export * from './common'; // TODO: Create common types file
+
+// Soil Records & Analysis
+export * from './soil-records';
 
 // Authentication
 export * from './login';

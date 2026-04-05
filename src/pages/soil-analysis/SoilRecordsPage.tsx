@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { SoilRecordsView } from '@/components/soil-analysis'
-import {
-  currentUser,
-  plots,
-  initialSoilRecords,
-  Role,
-  SoilRecord,
-} from '@/data/soil-records'
-import { SoilRecordForm } from '@/components/soil-analysis'
+import { useState } from 'react'
+import { SoilRecordsView, SoilRecordForm } from '@/components/soil-analysis'
+import type { Plot, SoilRecord } from '@/types/soil-records'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/store/slices/authStore'
 
+/**
+ * SoilRecordsPage — Trang hồ sơ phân tích đất riêng biệt
+ * Fix: biến `plots` phải được định nghĩa trong scope
+ */
 export function SoilRecordsPage() {
-  const [user, setUser] = useState(currentUser)
-  const [records, setRecords] = useState<SoilRecord[]>(initialSoilRecords)
+  const { user } = useAuthStore()
 
-  // Form state
+  // Placeholder — sẽ fetch từ API
+  const plots: Plot[] = []
+  const [records, setRecords] = useState<SoilRecord[]>([])
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<SoilRecord | null>(null)
 
@@ -29,25 +28,19 @@ export function SoilRecordsPage() {
   }
 
   const handleSaveRecord = (data: Partial<SoilRecord>) => {
-    if (editingRecord && editingRecord.id) {
-      // Update
+    if (!user) return
+    if (editingRecord?.id) {
       setRecords(
         records.map((r) =>
-          r.id === editingRecord.id
-            ? ({
-                ...r,
-                ...data,
-              } as SoilRecord)
-            : r
-        )
+          r.id === editingRecord.id ? ({ ...r, ...data } as SoilRecord) : r,
+        ),
       )
       toast.success('Đã cập nhật hồ sơ thành công')
     } else {
-      // Create
       const newRecord: SoilRecord = {
         ...data,
         id: `r${Date.now()}`,
-        createdBy: user.name,
+        createdBy: user.fullName,
         createdAt: new Date().toISOString(),
         isDeleted: false,
       } as SoilRecord
@@ -60,15 +53,29 @@ export function SoilRecordsPage() {
   const handleDeleteRecord = (id: string) => {
     setRecords(
       records.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              isDeleted: true,
-            }
-          : r
-      )
+        r.id === id ? { ...r, isDeleted: true } : r,
+      ),
     )
     toast.success('Đã chuyển hồ sơ vào thùng rác')
+  }
+
+  const soilUser = user
+    ? {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      }
+    : null
+
+  if (!soilUser) {
+    return (
+      <div className="space-y-6">
+        <p className="text-muted-foreground text-center py-8">
+          Vui lòng đăng nhập để xem hồ sơ phân tích.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -82,7 +89,7 @@ export function SoilRecordsPage() {
         </div>
 
         <SoilRecordsView
-          user={user}
+          user={soilUser}
           plots={plots}
           records={records}
           onAddRecord={handleAddRecord}

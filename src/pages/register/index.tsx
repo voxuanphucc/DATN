@@ -42,8 +42,8 @@ export function RegisterPage() {
           <AlertDescription className="text-green-800">
             Đăng ký thành công! Kiểm tra email để xác thực tài khoản.
             <div className="mt-3">
-              <Button 
-                onClick={() => navigate('/login')} 
+              <Button
+                onClick={() => navigate('/login')}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm h-9"
               >
                 Quay lại đăng nhập
@@ -101,18 +101,23 @@ export function RegisterPage() {
               )}
             </div>
 
-            {/* Farm Name */}
+            {/* Farm Name — PB01: yêu cầu nhập tên trang trại */}
             <div className="space-y-1">
               <Label htmlFor="farmName" className="text-xs font-semibold text-foreground">
                 Tên trang trại
+                <span className="text-muted-foreground font-normal ml-1">(tùy chọn)</span>
               </Label>
               <Input
                 id="farmName"
-                placeholder="Trang trại của tôi"
+                placeholder="Trang trại Hoa Hồng"
                 disabled={isSubmitting}
+                aria-invalid={!!errors.farmName}
                 {...register('farmName')}
                 className="input-field h-9 rounded-lg text-sm"
               />
+              {errors.farmName && (
+                <p className="text-xs text-red-600">{errors.farmName.message}</p>
+              )}
             </div>
 
             {/* Password */}

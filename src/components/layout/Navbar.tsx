@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDownIcon, ArrowUpRightIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-// import { useLogoutMutation } from "../hooks/api/useAuthMutations";
-// import { useProfile } from "../hooks/api/useUserQueries";
-// import { useAuthStore } from "../../store/zustand/useAuthStore";
+import { useAuthStore } from "../../store/slices/authStore";
 import { Button } from "../ui/button";
 import { NavbarDivider } from "./NavbarDivider";
 import LogoBrowser from "../../assets/Logo-browser.png";
@@ -93,12 +91,8 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
-  // Temporary: Auth context disabled until hooks are available
-  const isAuthenticated = false;
-  const user = null;
-  // const { isAuthenticated, setIsAuthenticated } = useAuthStore();
-  // const { data: user } = useProfile(isAuthenticated);
-  // const { mutate: logout } = useLogoutMutation();
+  // Get auth state from store
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   const config = variantConfig[variant];
   const { showLoginButton, showCreateButton, showDivider, showNavBackground } =
@@ -127,12 +121,8 @@ export function Navbar({
   }, []);
 
   const handleLogout = () => {
-    // logout(undefined, {
-    //   onSuccess: () => {
-    //     setIsAuthenticated(false);
-    //     navigate("/");
-    //   },
-    // });
+    logout();
+    navigate("/login");
   };
 
   return (

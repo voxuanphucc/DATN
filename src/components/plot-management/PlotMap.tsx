@@ -1,5 +1,5 @@
 import { useCallback, useState, useRef } from 'react'
-import { GoogleMap, useJsApiLoader, Polygon, Polyline } from '@react-google-maps/api'
+import { GoogleMap, useJsApiLoader, Polygon, Polyline, Marker } from '@react-google-maps/api'
 import {
   Plus,
   Minus,
@@ -8,6 +8,7 @@ import {
   Edit2,
   Save,
   X,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,7 +27,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Plot } from '@/types/plot-management'
-import { mockPlots } from '@/data/plots/mockPlots'
+// TODO: Fetch plots from API
+const mockPlots: any[] = []
 import { toast } from 'sonner'
 import { env } from '@/config/env'
 
@@ -77,6 +79,8 @@ export function PlotMap() {
   const [drawingPoints, setDrawingPoints] = useState<google.maps.LatLngLiteral[]>([])
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [calculatedArea, setCalculatedArea] = useState<number>(0)
+  const [draggedPointIndex, setDraggedPointIndex] = useState<number | null>(null)
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null)
 
   const mainMapRef = useRef<google.maps.Map | null>(null)
 
@@ -121,11 +125,57 @@ export function PlotMap() {
     return Math.round(hectares * 10) / 10
   }
 
+  // Check if two line segments intersect
+  const ccw = (A: google.maps.LatLngLiteral, B: google.maps.LatLngLiteral, C: google.maps.LatLngLiteral) => {
+    return (C.lat - A.lat) * (B.lng - A.lng) > (B.lat - A.lat) * (C.lng - A.lng)
+  }
+
+  const doSegmentsIntersect = (
+    A: google.maps.LatLngLiteral,
+    B: google.maps.LatLngLiteral,
+    C: google.maps.LatLngLiteral,
+    D: google.maps.LatLngLiteral,
+  ) => {
+    return ccw(A, C, D) !== ccw(B, C, D) && ccw(A, B, C) !== ccw(A, B, D)
+  }
+
+  // Validate polygon is not self-intersecting
+  const isValidPolygon = (points: google.maps.LatLngLiteral[]): boolean => {
+    if (points.length < 4) return true // 3 or fewer points can't self-intersect
+    
+    // Check each edge against every other non-adjacent edge
+    for (let i = 0; i < points.length; i++) {
+      const A = points[i]
+      const B = points[(i + 1) % points.length]
+      
+      // Start from i+2 to skip adjacent edges
+      for (let j = i + 2; j < points.length; j++) {
+        // Skip the edge that wraps around
+        if (i === 0 && j === points.length - 1) continue
+        
+        const C = points[j]
+        const D = points[(j + 1) % points.length]
+        
+        if (doSegmentsIntersect(A, B, C, D)) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
   const handleSaveDrawing = () => {
     if (drawingPoints.length < 3) {
       toast.error('Cần ít nhất 3 điểm để tạo vùng')
       return
     }
+    
+    // Validate polygon doesn't self-intersect
+    if (!isValidPolygon(drawingPoints)) {
+      toast.error('Đa giác tự giao nhau. Vui lòng vẽ lại.')
+      return
+    }
+
     const area = calculatePolygonArea(drawingPoints)
     setCalculatedArea(area)
     setShowConfirmDialog(true)
@@ -164,6 +214,40 @@ export function PlotMap() {
     if (isDrawing && e.latLng) {
       const newPoint = { lat: e.latLng.lat(), lng: e.latLng.lng() }
       setDrawingPoints((prev) => [...prev, newPoint])
+    }
+  }
+
+  const handlePointMouseDown = (e: React.MouseEvent, index: number) => {
+    if (isDrawing) {
+      e.preventDefault()
+      setDraggedPointIndex(index)
+    }
+  }
+
+  const handlePointMouseUp = () => {
+    setDraggedPointIndex(null)
+  }
+
+  const handlePointMouseMove = (e: google.maps.MapMouseEvent, index: number) => {
+    if (draggedPointIndex === index && e.latLng) {
+      const newPoints = [...drawingPoints]
+      newPoints[index] = { lat: e.latLng.lat(), lng: e.latLng.lng() }
+      
+      // Validate polygon still valid after move
+      if (isValidPolygon(newPoints)) {
+        setDrawingPoints(newPoints)
+      }
+    }
+  }
+
+  const handlePointContextMenu = (e: React.MouseEvent, index: number) => {
+    e.preventDefault()
+    if (isDrawing && drawingPoints.length > 3) {
+      const newPoints = drawingPoints.filter((_, i) => i !== index)
+      setDrawingPoints(newPoints)
+      toast.success('Đã xóa điểm')
+    } else if (isDrawing && drawingPoints.length <= 3) {
+      toast.error('Cần ít nhất 3 điểm để tạo vùng')
     }
   }
 
@@ -283,6 +367,54 @@ export function PlotMap() {
                     }}
                   />
                 )}
+                
+                {/* Render draggable point markers */}
+                {drawingPoints.map((point, index) => (
+                  <Marker
+                    key={index}
+                    position={point}
+                    draggable={true}
+                    onDragStart={() => setDraggedPointIndex(index)}
+                    onDrag={(e) => {
+                      if (e.latLng) {
+                        const newPoints = [...drawingPoints]
+                        newPoints[index] = {
+                          lat: e.latLng.lat(),
+                          lng: e.latLng.lng(),
+                        }
+                        // Only update if still valid
+                        if (isValidPolygon(newPoints)) {
+                          setDrawingPoints(newPoints)
+                        }
+                      }
+                    }}
+                    onDragEnd={() => setDraggedPointIndex(null)}
+                    onMouseOver={() => setHoveredPointIndex(index)}
+                    onMouseOut={() => setHoveredPointIndex(null)}
+                    onClick={(e) => {
+                      if (e.domEvent?.button === 2) { // Right click
+                        handlePointContextMenu(
+                          e.domEvent as any,
+                          index,
+                        )
+                      }
+                    }}
+                    title={`Điểm ${index + 1} - Kéo để di chuyển, Chuột phải để xóa`}
+                    icon={{
+                      path: 'M 0,-20 Q -20,0 0,20 Q 20,0 0,-20 Z',
+                      fillColor:
+                        draggedPointIndex === index
+                          ? '#ef4444'
+                          : hoveredPointIndex === index
+                            ? '#f59e0b'
+                            : '#3b82f6',
+                      fillOpacity: 1,
+                      strokeColor: '#fff',
+                      strokeWeight: 2,
+                      scale: 1.2,
+                    }}
+                  />
+                ))}
               </>
             )}
           </GoogleMap>
@@ -323,11 +455,17 @@ export function PlotMap() {
 
         {isDrawing && (
           <div className="absolute bottom-4 left-4 z-[1000] bg-background border rounded-lg p-3 shadow-lg">
-            <p className="text-sm font-medium mb-1">Đang vẽ ranh giới</p>
+            <p className="text-sm font-medium mb-2">Đang vẽ ranh giới</p>
             <p className="text-xs text-muted-foreground">
-              Click trên bản đồ để thêm điểm. Cần ít nhất 3 điểm.
+              • Click trên bản đồ để thêm điểm
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground">
+              • Kéo điểm để di chuyển vị trí
+            </p>
+            <p className="text-xs text-muted-foreground mb-2">
+              • Chuột phải trên điểm để xóa
+            </p>
+            <p className="text-xs text-muted-foreground font-semibold">
               Đã đánh dấu: {drawingPoints.length} điểm
             </p>
           </div>

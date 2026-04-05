@@ -29,6 +29,9 @@ export * from "./select";
 // Separator
 export * from "./separator";
 
+// Skeleton
+export * from "./skeleton";
+
 // Sonner (Toast)
 export * from "./sonner";
 

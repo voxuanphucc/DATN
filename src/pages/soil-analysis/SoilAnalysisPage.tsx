@@ -1,37 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SoilRecordForm, SoilRecordsView, AIAnalysisView } from '@/components/soil-analysis'
-import {
-  currentUser,
-  plots,
-  initialSoilRecords,
-  Role,
-  SoilRecord,
-} from '@/data/soil-records'
+import type { SoilRecord, Plot } from '@/types/soil-records'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageWrapper, PageHeader, PageContent } from '@/components/layout/PageWrapper'
 import { Beaker, Brain } from 'lucide-react'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/store/slices/authStore'
 
+/**
+ * SoilAnalysisPage — Hồ sơ phân tích đất (US08/PB08)
+ * - owner: tạo, xem, sửa (24h), xóa mềm
+ * - manager: chỉ xem (ẩn nút tạo/sửa/xóa)
+ * Plots và records sẽ được fetch từ API khi backend sẵn sàng
+ */
 export function SoilAnalysisPage() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<'records' | 'ai'>('records')
-  const [user, setUser] = useState(currentUser)
-  const [records, setRecords] = useState<SoilRecord[]>(initialSoilRecords)
+  const { user } = useAuthStore()
 
-  // Form state
+  // Placeholder — sẽ fetch từ API
+  const plots: Plot[] = []
+  const [records, setRecords] = useState<SoilRecord[]>([])
+
+  const [activeTab, setActiveTab] = useState<'records' | 'ai'>('records')
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingRecord, setEditingRecord] = useState<SoilRecord | null>(null)
-
-  const handleSetUserRole = (role: Role) => {
-    setUser({
-      ...user,
-      role,
-    })
-    toast.info(
-      `Đã chuyển sang vai trò: ${role === 'farmer' ? 'Nông dân' : 'Quản lý'}`
-    )
-  }
 
   const handleAddRecord = () => {
     setEditingRecord(null)
@@ -44,25 +37,19 @@ export function SoilAnalysisPage() {
   }
 
   const handleSaveRecord = (data: Partial<SoilRecord>) => {
-    if (editingRecord && editingRecord.id) {
-      // Update
+    if (!user) return
+    if (editingRecord?.id) {
       setRecords(
         records.map((r) =>
-          r.id === editingRecord.id
-            ? ({
-                ...r,
-                ...data,
-              } as SoilRecord)
-            : r
-        )
+          r.id === editingRecord.id ? ({ ...r, ...data } as SoilRecord) : r,
+        ),
       )
       toast.success('Đã cập nhật hồ sơ thành công')
     } else {
-      // Create
       const newRecord: SoilRecord = {
         ...data,
         id: `r${Date.now()}`,
-        createdBy: user.name,
+        createdBy: user.fullName,
         createdAt: new Date().toISOString(),
         isDeleted: false,
       } as SoilRecord
@@ -75,13 +62,8 @@ export function SoilAnalysisPage() {
   const handleDeleteRecord = (id: string) => {
     setRecords(
       records.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              isDeleted: true,
-            }
-          : r
-      )
+        r.id === id ? { ...r, isDeleted: true } : r,
+      ),
     )
     toast.success('Đã chuyển hồ sơ vào thùng rác')
   }
@@ -91,6 +73,16 @@ export function SoilAnalysisPage() {
     setActiveTab('records')
     setIsFormOpen(true)
   }
+
+  // Chuyển UserProfileDto sang User dùng trong soil-analysis
+  const soilUser = user
+    ? {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+      }
+    : null
 
   return (
     <PageWrapper variant="default">
@@ -108,13 +100,11 @@ export function SoilAnalysisPage() {
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
           }
-          
           .soil-tabs [role="tablist"] {
             display: flex;
             gap: 1rem;
             border-bottom: 1px solid #e5e7eb;
           }
-          
           .soil-tabs [role="tab"] {
             padding: 0.75rem 1.5rem;
             font-weight: 500;
@@ -124,20 +114,22 @@ export function SoilAnalysisPage() {
             transition: all 150ms;
             cursor: pointer;
           }
-          
           .soil-tabs [role="tab"][aria-selected="true"] {
             color: #1f2937;
             border-color: #1f2937;
           }
         `}</style>
         <div className="soil-tabs">
-          <Tabs value={activeTab} onValueChange={(val) => {
-            const newTab = val as 'records' | 'ai'
-            setActiveTab(newTab)
-            if (newTab === 'ai') {
-              navigate('/soil-ai-analysis')
-            }
-          }}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(val) => {
+              const newTab = val as 'records' | 'ai'
+              setActiveTab(newTab)
+              if (newTab === 'ai') {
+                navigate('/soil-ai-analysis')
+              }
+            }}
+          >
             <TabsList className="bg-transparent border-0 p-0">
               <TabsTrigger value="records" className="data-[state=active]:bg-transparent">
                 <Beaker className="w-4 h-4 mr-2" />
@@ -150,34 +142,48 @@ export function SoilAnalysisPage() {
             </TabsList>
 
             <TabsContent value="records" className="mt-6">
-              <SoilRecordsView
-                user={user}
-                plots={plots}
-                records={records}
-                onAddRecord={handleAddRecord}
-                onEditRecord={handleEditRecord}
-                onDeleteRecord={handleDeleteRecord}
-              />
+              {soilUser ? (
+                <SoilRecordsView
+                  user={soilUser}
+                  plots={plots}
+                  records={records}
+                  onAddRecord={handleAddRecord}
+                  onEditRecord={handleEditRecord}
+                  onDeleteRecord={handleDeleteRecord}
+                />
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  Vui lòng đăng nhập để xem hồ sơ phân tích.
+                </p>
+              )}
             </TabsContent>
 
             <TabsContent value="ai" className="mt-6">
-              <AIAnalysisView
-                user={user}
-                plots={plots}
-                onSaveExtractedData={handleSaveExtractedData}
-              />
+              {soilUser ? (
+                <AIAnalysisView
+                  user={soilUser}
+                  plots={plots}
+                  onSaveExtractedData={handleSaveExtractedData}
+                />
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  Vui lòng đăng nhập để sử dụng phân tích AI.
+                </p>
+              )}
             </TabsContent>
           </Tabs>
         </div>
       </PageContent>
 
-      <SoilRecordForm
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        plots={plots}
-        initialData={editingRecord}
-        onSave={handleSaveRecord}
-      />
+      {soilUser && (
+        <SoilRecordForm
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
+          plots={plots}
+          initialData={editingRecord}
+          onSave={handleSaveRecord}
+        />
+      )}
     </PageWrapper>
   )
 }

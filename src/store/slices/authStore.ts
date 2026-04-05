@@ -46,6 +46,15 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       ...initialState,
 
+      login: (user: UserProfileDto, accessToken: string, refreshToken: string) =>
+        set({
+          user,
+          accessToken,
+          refreshToken,
+          isAuthenticated: true,
+          isLoading: false,
+        }),
+
       setTokens: (accessToken: string, refreshToken: string) =>
         set({
           accessToken,

@@ -21,18 +21,24 @@ import {
   ChangeRoleDialog,
   RemoveMemberDialog,
 } from '../../components/team-management'
-import { mockMembers, mockInvitations, mockTasks } from '../../data/mockData'
 import { Member, Invitation, Task, MemberRole } from '../../types/team'
+import { useAuthStore } from '@/store/slices/authStore'
 
 export function TeamManagementPage() {
-  const [members, setMembers] = useState<Member[]>(mockMembers)
-  const [invitations, setInvitations] = useState<Invitation[]>(mockInvitations)
-  const [tasks, setTasks] = useState<Task[]>(mockTasks)
+  const [members, setMembers] = useState<Member[]>([])
+  const [invitations, setInvitations] = useState<Invitation[]>([])
+  const [tasks, setTasks] = useState<Task[]>([])
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   const [selectedMemberForRole, setSelectedMemberForRole] =
     useState<Member | null>(null)
   const [selectedMemberForRemove, setSelectedMemberForRemove] =
     useState<Member | null>(null)
+
+  // Get current user from auth store
+  const { user: authUser } = useAuthStore()
+  const currentUser = authUser
+    ? members.find((m) => m.email === authUser.email)
+    : undefined
 
   const activeMembersCount = members.filter((m) => m.status === 'active').length
   const pendingInvitesCount = invitations.filter(
@@ -40,13 +46,15 @@ export function TeamManagementPage() {
   ).length
 
   const handleInvite = (email: string, role: MemberRole) => {
+    // Spec PB04: chỉ mời manager hoặc employee, không mời owner
+    if (role === 'owner') return
     const newInvite: Invitation = {
       id: `inv_${Date.now()}`,
       email,
-      role,
+      role: role as 'manager' | 'employee',
       status: 'pending',
       invitedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 86400000 * 3).toISOString(),
+      expiresAt: new Date(Date.now() + 86400000 * 3).toISOString(), // 72h
       token: `token_${Date.now()}`,
     }
     setInvitations([newInvite, ...invitations])
@@ -114,7 +122,7 @@ export function TeamManagementPage() {
     <PageWrapper variant="default">
       <PageHeader
         title="Quản lý thành viên"
-        subtitle="Trang trại Hoa Hồng"
+        subtitle={authUser?.farmName || 'Quản lý thành viên trang trại'}
         icon={<Users className="w-6 h-6 text-gray-700" />}
         action={
           <Button 
@@ -195,6 +203,7 @@ export function TeamManagementPage() {
             <TabsContent value="members" className="space-y-4">
               <MemberList
                 members={members}
+                currentUserId={currentUser?.id}
                 onChangeRoleClick={setSelectedMemberForRole}
                 onRemoveClick={setSelectedMemberForRemove}
               />

@@ -21,18 +21,24 @@ import {
 } from '../ui/dropdown-menu'
 import { Member, MemberRole, MemberStatus } from '../../types/team'
 import { MoreHorizontal, Shield, UserCog, UserMinus } from 'lucide-react'
+import { TeamMembersTableSkeleton } from '../skeletons'
+import { useSimulatedLoading } from '../../hooks/useSimulatedLoading'
 
 interface MemberListProps {
   members: Member[]
+  currentUserId?: string
   onChangeRoleClick: (member: Member) => void
   onRemoveClick: (member: Member) => void
 }
 
 export function MemberList({
   members,
+  currentUserId,
   onChangeRoleClick,
   onRemoveClick,
 }: MemberListProps) {
+  // Simulate loading state for skeleton display
+  const isLoading = useSimulatedLoading(true, 300)
   const getRoleBadge = (role: MemberRole) => {
     switch (role) {
       case 'owner':
@@ -110,7 +116,7 @@ export function MemberList({
       .toUpperCase()
   }
 
-  if (members.length === 0) {
+  if (members.length === 0 && !isLoading) {
     return (
       <div className="text-center py-10 border rounded-lg bg-muted/20">
         <p className="text-muted-foreground">
@@ -118,6 +124,10 @@ export function MemberList({
         </p>
       </div>
     )
+  }
+
+  if (isLoading) {
+    return <TeamMembersTableSkeleton />
   }
 
   return (
@@ -182,6 +192,8 @@ export function MemberList({
                       <DropdownMenuItem
                         onClick={() => onRemoveClick(member)}
                         className="text-destructive focus:text-destructive"
+                        disabled={currentUserId === member.id}
+                        title={currentUserId === member.id ? "Không thể xóa chính mình" : ""}
                       >
                         <UserMinus className="mr-2 h-4 w-4" />
                         <span>Xóa khỏi trang trại</span>
