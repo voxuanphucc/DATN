@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { AuthLayout } from '../../components/auth/AuthLayout';
-import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Alert, AlertDescription } from '../../components/ui/alert';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useResetPassword } from '../../hooks/reset-password/useResetPassword';
+import { useState } from 'react';
+import LoginBg from '@/assets/login.png';
+import LogoBrowser from '@/assets/Logo-browser.png';
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     form: { register, formState: { errors, isSubmitting } },
     serverError,
@@ -18,81 +19,433 @@ export function ResetPasswordPage() {
   } = useResetPassword();
 
   return (
-    <AuthLayout
-      title="Đặt lại mật khẩu"
-      subtitle="Vui lòng nhập mật khẩu mới cho tài khoản của bạn."
-      imageSrc="https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=2000&auto=format&fit=crop"
-    >
-      {!isTokenValid ? (
-        <div className="grid gap-6">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.
-            </AlertDescription>
-          </Alert>
-          <Button onClick={() => navigate('/forgot-password')} className="w-full">
-            Yêu cầu liên kết mới
-          </Button>
-        </div>
-      ) : isSuccess ? (
-        <Alert className="border-green-500 bg-green-50 dark:bg-green-950/50">
-          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            Đặt lại mật khẩu thành công! Đang chuyển hướng đến trang đăng nhập...
-          </AlertDescription>
-        </Alert>
-      ) : (
-        <div className="grid gap-6">
-          <form onSubmit={onSubmit}>
-            <div className="grid gap-4">
-              {serverError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{serverError}</AlertDescription>
-                </Alert>
-              )}
+    <div className="h-screen w-full flex">
+      <style>{`
+        /* Left Column - Form Section */
+        .form-section {
+          width: 100%;
+          height: 100vh;
+          background: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.5rem 1rem;
+          position: relative;
+          overflow: hidden;
+        }
 
-              {/* New password */}
-              <div className="grid gap-2">
-                <Label htmlFor="password">Mật khẩu mới</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.password}
-                  {...register('password')}
-                />
-                {errors.password ? (
-                  <p className="text-xs text-destructive">{errors.password.message}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">≥ 8 ký tự, có chữ hoa và số</p>
-                )}
+        @media (min-width: 1024px) {
+          .form-section {
+            width: 50%;
+            padding: 2rem 2.5rem;
+            overflow: hidden;
+          }
+        }
+
+        .form-container {
+          width: 100%;
+          max-width: 400px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+          padding: 1.5rem;
+          border-radius: 12px;
+          background: white;
+        }
+
+        .form-header {
+          margin-bottom: 1.25rem;
+        }
+
+        .form-title {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #1f2937;
+          margin-bottom: 0.25rem;
+        }
+
+        .form-subtitle {
+          color: #6b7280;
+          font-size: 0.85rem;
+        }
+
+        .form-group {
+          margin-bottom: 0.9rem;
+        }
+
+        .form-label {
+          font-weight: 600;
+          color: #111827;
+          font-size: 0.8rem;
+          display: block;
+          margin-bottom: 0.25rem;
+        }
+
+        .form-hint {
+          color: #6b7280;
+          font-size: 0.75rem;
+          margin-top: 0.25rem;
+          display: block;
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 0.625rem 0.75rem;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          background-color: #fff;
+          color: #1f2937;
+          transition: all 0.2s;
+        }
+
+        .form-input::placeholder {
+          color: #9ca3af;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: #10b981;
+          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+          background-color: #fafafa;
+        }
+
+        .form-input:disabled {
+          background-color: #f3f4f6;
+          color: #9ca3af;
+          cursor: not-allowed;
+        }
+
+        .password-toggle-btn {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: #9ca3af;
+          cursor: pointer;
+          padding: 4px 8px;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+        }
+
+        .password-toggle-btn:hover {
+          color: #10b981;
+        }
+
+        .error-text {
+          color: #ef4444;
+          font-size: 0.75rem;
+          font-weight: 500;
+          margin-top: 0.25rem;
+          display: block;
+        }
+
+        .error-alert {
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          border-radius: 8px;
+          padding: 0.75rem 0.875rem;
+          margin-bottom: 1rem;
+          display: flex;
+          gap: 0.6rem;
+          align-items: flex-start;
+        }
+
+        .error-alert-icon {
+          color: #ef4444;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .error-alert-text {
+          color: #7f1d1d;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        .success-alert {
+          background: #f0fdf4;
+          border: 1px solid #bbf7d0;
+          border-radius: 8px;
+          padding: 0.75rem 0.875rem;
+          margin-bottom: 1rem;
+          display: flex;
+          gap: 0.6rem;
+          align-items: flex-start;
+        }
+
+        .success-alert-icon {
+          color: #22c55e;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .success-alert-text {
+          color: #166534;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        .invalid-alert {
+          background: #fee2e2;
+          border: 1px solid #fca5a5;
+          border-radius: 8px;
+          padding: 0.75rem 0.875rem;
+          margin-bottom: 1rem;
+          display: flex;
+          gap: 0.6rem;
+          align-items: flex-start;
+        }
+
+        .invalid-alert-icon {
+          color: #dc2626;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .invalid-alert-text {
+          color: #7f1d1d;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 0.7rem 1.25rem;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.4rem;
+          margin-top: 0.6rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .back-btn {
+          width: 100%;
+          padding: 0.7rem 1.25rem;
+          background: white;
+          color: #10b981;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 0.6rem;
+        }
+
+        .back-btn:hover {
+          background: #f9fafb;
+          border-color: #10b981;
+        }
+
+        /* Right Column - Image Section */
+        .image-section {
+          display: none;
+          width: 50%;
+          background-size: cover;
+          background-position: center;
+          position: relative;
+          border-radius: 16px 0 0 16px;
+        }
+
+        @media (min-width: 1024px) {
+          .image-section {
+            display: block;
+          }
+        }
+
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .form-container {
+          animation: slideInLeft 0.5s ease-out;
+        }
+      `}</style>
+
+      {/* Left Section - Form */}
+      <div className="form-section">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="absolute top-0 left-0 p-4 md:p-8 flex items-center gap-2.5 bg-none border-none cursor-pointer hover:scale-105 transition-transform duration-300"
+        >
+          <div className="relative" style={{
+            filter: 'drop-shadow(0 4px 8px rgba(5, 150, 105, 0.25))'
+          }}>
+            <img
+              src={LogoBrowser}
+              alt="FarmerAI logo"
+              className="h-8 md:h-10 object-contain transition-transform duration-300"
+              style={{ filter: 'hue-rotate(0deg) brightness(1.1) saturate(1.3)' }}
+            />
+          </div>
+          <span 
+            className="font-prompt font-extrabold text-[38px] leading-none"
+            style={{
+              background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '0 2px 4px rgba(5, 150, 105, 0.1)'
+            }}
+          >
+            farmarAI
+          </span>
+        </button>
+        <div className="form-container">
+          {!isTokenValid ? (
+            <>
+              <div className="invalid-alert">
+                <AlertCircle className="invalid-alert-icon h-5 w-5" />
+                <div className="invalid-alert-text">
+                  Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="submit-btn"
+              >
+                Yêu cầu liên kết mới
+              </button>
+            </>
+          ) : isSuccess ? (
+            <>
+              <div className="success-alert">
+                <CheckCircle2 className="success-alert-icon h-5 w-5" />
+                <div className="success-alert-text">
+                  Đặt lại mật khẩu thành công! Đang chuyển hướng đến trang đăng nhập...
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="form-header">
+                <h1 className="form-title">Đặt lại mật khẩu</h1>
+                <p className="form-subtitle">Vui lòng nhập mật khẩu mới cho tài khoản của bạn</p>
               </div>
 
-              {/* Confirm password */}
-              <div className="grid gap-2">
-                <Label htmlFor="confirmPassword">Xác nhận mật khẩu mới</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  disabled={isSubmitting}
-                  aria-invalid={!!errors.confirmPassword}
-                  {...register('confirmPassword')}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+              <form onSubmit={onSubmit}>
+                {/* Error Alert */}
+                {serverError && (
+                  <div className="error-alert">
+                    <AlertCircle className="error-alert-icon h-5 w-5" />
+                    <div className="error-alert-text">{serverError}</div>
+                  </div>
                 )}
-              </div>
 
-              <Button type="submit" disabled={isSubmitting} className="w-full mt-2">
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Cập nhật mật khẩu
-              </Button>
-            </div>
-          </form>
+                {/* Password Field */}
+                <div className="form-group">
+                  <label htmlFor="password" className="form-label">Mật khẩu mới</label>
+                  <div className="input-wrapper">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="nhập mật khẩu mới"
+                      disabled={isSubmitting}
+                      aria-invalid={!!errors.password}
+                      {...register('password')}
+                      className="form-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="password-toggle-btn"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                  {errors.password ? (
+                    <span className="error-text">{errors.password.message}</span>
+                  ) : (
+                    <span className="form-hint">≥ 8 ký tự, có chữ hoa và số</span>
+                  )}
+                </div>
+
+                {/* Confirm Password Field */}
+                <div className="form-group">
+                  <label htmlFor="confirmPassword" className="form-label">Xác nhận mật khẩu mới</label>
+                  <div className="input-wrapper">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="xác nhận mật khẩu mới"
+                      disabled={isSubmitting}
+                      aria-invalid={!!errors.confirmPassword}
+                      {...register('confirmPassword')}
+                      className="form-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="password-toggle-btn"
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <span className="error-text">{errors.confirmPassword.message}</span>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="submit-btn"
+                >
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isSubmitting ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
-      )}
-    </AuthLayout>
+      </div>
+
+      {/* Right Section - Image */}
+      <div
+        className="image-section"
+        style={{
+          backgroundImage: `url(${LoginBg})`,
+        }}
+      />
+    </div>
   );
 }

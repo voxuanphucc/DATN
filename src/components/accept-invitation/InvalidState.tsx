@@ -24,8 +24,7 @@ export function InvalidState() {
       </CardHeader>
       <CardFooter>
         <Button
-          variant="outline"
-          className="w-full"
+          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
           onClick={() => navigate('/')}
         >
           Về trang chủ

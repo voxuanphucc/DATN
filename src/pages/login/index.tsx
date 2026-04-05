@@ -337,16 +337,27 @@ export function LoginPage() {
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="absolute top-0 left-0 p-4 md:p-8 flex items-center gap-2 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity"
+          className="absolute top-0 left-0 p-4 md:p-8 flex items-center gap-2.5 bg-none border-none cursor-pointer hover:scale-105 transition-transform duration-300"
         >
-          <img
-            src={LogoBrowser}
-            alt="FarmerAI logo"
-            className="h-8 md:h-10 object-contain"
-          />
+          <div className="relative" style={{
+            filter: 'drop-shadow(0 4px 8px rgba(5, 150, 105, 0.25))'
+          }}>
+            <img
+              src={LogoBrowser}
+              alt="FarmerAI logo"
+              className="h-8 md:h-10 object-contain transition-transform duration-300"
+              style={{ filter: 'hue-rotate(0deg) brightness(1.1) saturate(1.3)' }}
+            />
+          </div>
           <span 
-            className="font-extrabold text-lg md:text-4xl"
-            style={{ color: 'rgba(4, 128, 92, 1)' }}
+            className="font-prompt font-extrabold text-[38px] leading-none"
+            style={{
+              background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '0 2px 4px rgba(5, 150, 105, 0.1)'
+            }}
           >
             farmarAI
           </span>
@@ -437,7 +448,7 @@ export function LoginPage() {
                 defaultChecked
               />
               <label htmlFor="remember" className="remember-label">
-                Ghi nhớ tôi trong 30 ngày
+                Ghi nhớ đăng nhập
               </label>
             </div>
 

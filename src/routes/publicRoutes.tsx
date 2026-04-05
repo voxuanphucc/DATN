@@ -7,6 +7,7 @@ import { ResetPasswordPage } from '../pages/reset-password';
 import { EmailVerificationPage } from '../pages/email-verification';
 import AcceptInvitationPage from '../pages/AcceptInvitation';
 import { ForbiddenPage } from '../pages/forbidden';
+import { NotFoundPage } from '../pages/not-found';
 
 /**
  * Public Routes - Không cần authentication
@@ -18,6 +19,7 @@ import { ForbiddenPage } from '../pages/forbidden';
  * - Email verification
  * - Accept invitation (token-based access)
  * - Forbidden page (for RBAC access denied)
+ * - 404 Not Found page (wildcard catch-all)
  * 
  * Các routes khác được move sang privateRoutes.tsx
  */
@@ -53,5 +55,9 @@ export const publicRoutes: RouteObject[] = [
   {
     path: '/forbidden',
     element: <ForbiddenPage />,
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ];

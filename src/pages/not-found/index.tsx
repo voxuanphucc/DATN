@@ -2,13 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { AlertCircle } from 'lucide-react';
 import LogoBrowser from '@/assets/Logo-browser.png';
-import LoginBg from '@/assets/login.png';
 
 /**
- * ForbiddenPage - 403 Forbidden
- * User không có quyền truy cập route này
+ * NotFoundPage - 404 Not Found
+ * Route không tồn tại
  */
-export function ForbiddenPage() {
+export function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
@@ -40,7 +39,7 @@ export function ForbiddenPage() {
           display: none;
           width: 50%;
           height: 100vh;
-          background-image: url('${LoginBg}');
+          background-image: url('src/assets/login.png');
           background-size: cover;
           background-position: center;
           border-radius: 16px 0 0 16px;
@@ -52,7 +51,7 @@ export function ForbiddenPage() {
           }
         }
 
-        .forbidden-container {
+        .not-found-container {
           width: 100%;
           max-width: 400px;
           text-center;
@@ -88,21 +87,21 @@ export function ForbiddenPage() {
           </span>
         </button>
 
-        <div className="forbidden-container">
+        <div className="not-found-container">
           {/* Icon */}
           <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">403</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">404</h1>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Truy Cập Bị Từ Chối
+            Trang Không Tồn Tại
           </h2>
 
           {/* Description */}
           <p className="text-gray-600 mb-8 leading-relaxed">
-            Bạn không có quyền truy cập trang này. Vui lòng liên hệ với quản trị viên nếu bạn cho rằng đây là lỗi.
+            Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
           </p>
 
           {/* Actions */}
@@ -133,4 +132,4 @@ export function ForbiddenPage() {
   );
 }
 
-export default ForbiddenPage;
+export default NotFoundPage;
