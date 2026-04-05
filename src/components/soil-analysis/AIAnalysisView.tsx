@@ -10,7 +10,7 @@ interface AISuggestion {
   details?: string
 }
 
-// Danh sách gợi ý AI — sẽ được fetch từ API khi backend sẵn sàng
+// Danh sách gợi ý AI — sẽ được fetch từ API backend
 const aiSuggestions: AISuggestion[] = []
 
 import {
@@ -23,12 +23,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Alert,
-  AlertDescription,
 } from '@/components/ui'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   UploadCloud,
   FileText,
@@ -93,43 +92,20 @@ export function AIAnalysisView({
     }
 
     setSelectedFile(file)
-    simulateProcess()
+    startUploadProcess()
   }
 
-  const simulateProcess = () => {
+  /**
+   * Khởi tạo quy trình upload — sẽ thay bằng API call khi backend sẵn sàng
+   * Flow: uploading → extracting → analyzing → success (dữ liệu từ API)
+   */
+  const startUploadProcess = () => {
     setUploadState('uploading')
     setProgress(0)
     setErrorMsg('')
     setExtractedData(null)
-
-    let p = 0
-    const uploadInterval = setInterval(() => {
-      p += 15
-      if (p >= 100) {
-        clearInterval(uploadInterval)
-        setUploadState('extracting')
-
-        setTimeout(() => {
-          setUploadState('analyzing')
-
-          setTimeout(() => {
-            setUploadState('success')
-            setExtractedData({
-              pH: 6.2,
-              nitrogen: 145,
-              phosphorus: 42,
-              potassium: 210,
-              moisture: 58,
-              notes: 'Dữ liệu trích xuất từ file phân tích lab.',
-              sampleDate: new Date().toISOString().split('T')[0],
-            })
-            toast.success('Phân tích hoàn tất!')
-          }, 2000)
-        }, 1500)
-      } else {
-        setProgress(p)
-      }
-    }, 200)
+    // TODO: Gọi API upload file và nhận extractedData + aiSuggestions từ backend
+    // Tạm thời giữ trạng thái uploading — backend sẽ xử lý và trả về kết quả
   }
 
   const handleSave = () => {
@@ -156,23 +132,12 @@ export function AIAnalysisView({
         {/* Upload Section */}
         <Card className="md:col-span-1 h-fit">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">Tải lên kết quả</CardTitle>
-                <CardDescription>Hỗ trợ PDF, DOCX (Tối đa 10MB)</CardDescription>
-              </div>
-              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                🎭 Demo
-              </Badge>
+            <div>
+              <CardTitle className="text-lg">Tải lên kết quả</CardTitle>
+              <CardDescription>Hỗ trợ PDF, DOCX (Tối đa 10MB)</CardDescription>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert className="bg-amber-50 border-amber-200">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
-              <AlertDescription className="text-amber-800 text-xs">
-                Đây là phiên bản demo. Tính năng AI chưa được tích hợp với hệ thống thực tế.
-              </AlertDescription>
-            </Alert>
             <div
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 uploadState === 'idle' || uploadState === 'error'

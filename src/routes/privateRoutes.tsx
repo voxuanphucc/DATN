@@ -7,17 +7,7 @@ import { SoilAnalysisPage, AIAnalysisPage } from '../pages/soil-analysis';
 import { ChangePasswordPage } from '../pages/change-password';
 import { TasksPage } from '../pages/tasks';
 
-/**
- * Private Routes - Cần authentication (được protected bởi PrivateRoute)
- * 
- * Tất cả routes ở đây được wrapped bởi <PrivateRoute> component
- * để đảm bảo chỉ authenticated users mới truy cập được
- * 
- * RBAC (Role-Based Access Control):
- * - owner: Chủ trang trại (toàn quyền)
- * - manager: Quản lý (quản lý nhân viên, xem phân tích)
- * - employee: Nhân viên (xem/nhập dữ liệu, không sửa/xóa)
- */
+
 export const privateRoutes: RouteObject[] = [
   {
     path: '/dashboard',

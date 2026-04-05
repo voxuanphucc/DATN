@@ -6,9 +6,10 @@
 export const env = {
   // Google Maps API Key
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+  // API Base URL
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '',
 
-  // API Base URL (if needed)
-  // apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+
 } as const;
 
 // Type-safe access to environment variables
