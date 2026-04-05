@@ -37,7 +37,7 @@ export function ForbiddenPage() {
             Quay Lại
           </Button>
           <Button
-            variant="primary"
+            variant="default"
             onClick={() => navigate('/dashboard')}
           >
             Về Dashboard

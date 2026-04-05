@@ -4,7 +4,6 @@ import { useReveal } from "@/components/hooks/useReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui";
 import { Textarea } from "@/components/ui";
-import BackgroundForm from "@/assets/BackgroundForm.png";
 
 const ContactSection = forwardRef<HTMLDivElement>((_, ref) => {
   const { ref: revealRef, visible } = useReveal(0.1);
@@ -14,12 +13,6 @@ const ContactSection = forwardRef<HTMLDivElement>((_, ref) => {
       ref={ref}
       id="section-4"
       className="w-full bg-[#FDF6E3] py-[100px] px-[93px] relative"
-      style={{
-        backgroundImage: `url(${BackgroundForm})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
     >
       {/* Overlay for better text contrast */}
       <div className="absolute inset-0 bg-[#FDF6E3]/85"></div>
@@ -73,14 +66,11 @@ const ContactSection = forwardRef<HTMLDivElement>((_, ref) => {
               Gửi tin nhắn cho chúng tôi
             </h3>
             <div className="flex flex-col gap-4">
-              <Input type="text" placeholder="Họ và tên" variant="primary" size="md" fullWidth />
-              <Input type="email" placeholder="Địa chỉ email" variant="primary" size="md" fullWidth />
+              <Input type="text" placeholder="Họ và tên" />
+              <Input type="email" placeholder="Địa chỉ email" />
               <Textarea
                 placeholder="Nội dung tin nhắn..."
                 rows={4}
-                variant="primary"
-                size="md"
-                fullWidth
               />
               <Button variant="cta-yellow" size="md" fullWidth>
                 Gửi tin nhắn →
