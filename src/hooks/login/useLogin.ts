@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { toast } from 'sonner';
 import { useLoginMutation } from '../auth/useLoginMutation';
 import { loginSchema, type LoginFormValues } from '../../lib/schemas/auth';
 
@@ -32,7 +33,7 @@ export function useLogin() {
   const [serverError, setServerError] = useState<string | null>(null);
   
   // Use React Query mutation hook
-  const { mutate: performLogin, isPending: isLoading } = useLoginMutation();
+  const { mutate: performLogin, isPending } = useLoginMutation();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -94,9 +95,9 @@ export function useLogin() {
       const lockedUntil = oldestAttempt + LOCKOUT_DURATION;
       if (Date.now() < lockedUntil) {
         const minutesLeft = Math.ceil((lockedUntil - Date.now()) / 60000);
-        setServerError(
-          `Tài khoản bị khóa tạm thời do đăng nhập sai nhiều lần. Vui lòng thử lại sau ${minutesLeft} phút.`,
-        );
+        const lockoutMsg = `Tài khoản bị khóa tạm thời do đăng nhập sai nhiều lần. Vui lòng thử lại sau ${minutesLeft} phút.`;
+        setServerError(lockoutMsg);
+        toast.error(lockoutMsg);
         return;
       } else {
         clearFailedAttempts(data.email);
@@ -108,13 +109,16 @@ export function useLogin() {
       onSuccess: () => {
         clearFailedAttempts(data.email);
         // Tokens auto-saved by useLoginMutation via setTokens()
+        toast.success('Đăng nhập thành công!');
         // Redirect to dashboard
         // TODO: Fetch user profile separately to determine redirect route
         navigate('/dashboard');
       },
       onError: (error: Error | null) => {
         if (!error || !axios.isAxiosError(error)) {
-          setServerError('Đã có lỗi xảy ra. Vui lòng thử lại.');
+          const msg = 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+          setServerError(msg);
+          toast.error(msg);
           return;
         }
 
@@ -124,29 +128,28 @@ export function useLogin() {
         // Detect timeout errors
         const isTimeout = error.message?.includes('timeout') || error.code === 'ECONNABORTED';
         
+        let errorMsg = '';
+        
         if (isTimeout) {
-          setServerError('Kết nối timed out. Server đang khởi động, vui lòng thử lại sau 1-2 phút.');
+          errorMsg = 'Kết nối timed out. Server đang khởi động, vui lòng thử lại sau 1-2 phút.';
         } else if (status === 401) {
           const failedCount = recordFailedAttempt(data.email);
           if (failedCount >= FAILED_ATTEMPTS_LIMIT) {
-            setServerError(
-              'Tài khoản bị khóa tạm thời (5 lần sai liên tiếp). Vui lòng thử lại sau 15 phút.',
-            );
+            errorMsg = 'Tài khoản bị khóa tạm thời (5 lần sai liên tiếp). Vui lòng thử lại sau 15 phút.';
           } else {
-            setServerError('Email hoặc mật khẩu không đúng.');
+            errorMsg = 'Email hoặc mật khẩu không đúng.';
           }
         } else if (status === 403) {
-          setServerError(
-            'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị hệ thống.',
-          );
+          errorMsg = 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị hệ thống.';
         } else if (status === 423) {
-          setServerError(
-            'Tài khoản bị khóa tạm thời do đăng nhập sai nhiều lần. Vui lòng thử lại sau.',
-          );
+          errorMsg = 'Tài khoản bị khóa tạm thời do đăng nhập sai nhiều lần. Vui lòng thử lại sau.';
         } else {
           recordFailedAttempt(data.email);
-          setServerError(msg || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+          errorMsg = msg || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
         }
+        
+        setServerError(errorMsg);
+        toast.error(errorMsg);
         console.error('Lỗi đăng nhập:', error);
       },
     });
@@ -155,7 +158,7 @@ export function useLogin() {
   return {
     form,
     serverError,
-    isLoading,
+    isLoading: isPending,
     onSubmit: form.handleSubmit(onSubmit),
   };
 }
