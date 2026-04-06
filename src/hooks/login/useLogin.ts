@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useLoginMutation } from '../auth/useLoginMutation';
 import { loginSchema, type LoginFormValues } from '../../lib/schemas/auth';
 import type { UseLoginReturn } from '../auth/auth.types';
+import { getRoleFromToken } from '../../utils/jwt';
 
 interface LoginAttempt {
   email: string;
@@ -107,13 +108,27 @@ export function useLogin(): UseLoginReturn {
 
     // Call login mutation with error handling
     performLogin(data, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         clearFailedAttempts(data.email);
         // Tokens auto-saved by useLoginMutation via setTokens()
+        
         toast.success('Đăng nhập thành công!');
-        // Redirect to dashboard
-        // TODO: Fetch user profile separately to determine redirect route
-        navigate('/dashboard');
+        
+        // Get role from access token to determine redirect
+        const accessToken = response.data?.accessToken;
+        if (accessToken) {
+          const role = getRoleFromToken(accessToken);
+          
+          // Redirect based on role
+          if (role === 'employee') {
+            navigate('/tasks');
+          } else {
+            navigate('/dashboard');
+          }
+        } else {
+          // Fallback to dashboard
+          navigate('/dashboard');
+        }
       },
       onError: (error: Error | null) => {
         if (!error || !axios.isAxiosError(error)) {

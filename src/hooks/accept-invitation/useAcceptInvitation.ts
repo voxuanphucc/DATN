@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { acceptInvitationService } from '../../services/accept-invitation';
 import { type InvitationDto } from '../../types/get-invitations';
+import { useAuthStore } from '../../store/slices/authStore';
 
 /**
  * useAcceptInvitation Hook
@@ -24,6 +25,7 @@ export function useAcceptInvitation() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const email = searchParams.get('email');
+  const { setTokens } = useAuthStore();
 
   const [invitationState, setInvitationState] = useState<InvitationState>('loading');
   const [invitation, setInvitation] = useState<InvitationDto | null>(null);
@@ -89,9 +91,12 @@ export function useAcceptInvitation() {
       });
 
       if (response.success) {
-        // Lưu token nếu backend trả về
-        if (response.data.token) {
-          localStorage.setItem('accessToken', response.data.token);
+        // Lưu tokens vào Zustand store (tự động sync với localStorage)
+        if (response.data.accessToken && response.data.refreshToken) {
+          setTokens(response.data.accessToken, response.data.refreshToken);
+        } else if (response.data.token) {
+          // Legacy support: nếu API chỉ trả về 'token' field
+          setTokens(response.data.token, response.data.token);
         }
         // Redirect được handled ở component level với useEffect
         return response.data;

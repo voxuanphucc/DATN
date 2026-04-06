@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDownIcon, ArrowUpRightIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useAuthStore } from "../../store/slices/authStore";
 import { Button } from "../ui/button";
 import { NavbarDivider } from "./NavbarDivider";
@@ -102,11 +103,11 @@ export function Navbar({
   useEffect(() => {
     // Reset mount animation
     const t = setTimeout(() => setMounted(true), 100);
-    
+
     // Reset scroll state when component mounts
     setScrolled(false);
     setScrollY(0);
-    
+
     return () => clearTimeout(t);
   }, []);
 
@@ -121,9 +122,24 @@ export function Navbar({
   }, []);
 
   const handleLogout = () => {
+    // Clear auth state
     logout();
-    navigate("/login");
+    
+    // Show success message
+    toast.success("Đã đăng xuất thành công");
+    
+    // Redirect to login page
+    navigate("/login", { replace: true });
   };
+
+  // Map role to Vietnamese
+  const roleDisplayMap: Record<string, string> = {
+    owner: "Chủ Trang Trại",
+    manager: "Quản Lý",
+    employee: "Nhân Viên",
+  };
+
+  const roleDisplay = user?.role ? roleDisplayMap[user.role] || user.role : "";
 
   return (
     <>
@@ -214,21 +230,28 @@ export function Navbar({
             className={`flex items-center gap-2.5 shrink-0 transition-all duration-[700ms] ease-out delay-[600ms]
               ${mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}
           >
-            {isAuthenticated ? (
+            {variant === "dashboard" && isAuthenticated ? (
               <>
                 <div
-                  className={`flex items-center gap-2 h-12 px-4 rounded-xl border ${
+                  className={`flex flex-col gap-0.5 h-12 px-4 py-1.5 rounded-xl border ${
                     scrolled
                       ? "border-gray-300 bg-gray-50"
                       : "border-light-yellow-1 bg-white/5"
                   }`}
                 >
                   <span
-                    className={`font-roboto text-[14px] font-medium leading-none ${
+                    className={`font-roboto text-[13px] font-semibold leading-tight ${
                       scrolled ? "text-gray-800" : "text-light-yellow-1"
                     }`}
                   >
                     {user?.fullName || user?.email || "User"}
+                  </span>
+                  <span
+                    className={`font-roboto text-[11px] font-normal leading-tight ${
+                      scrolled ? "text-gray-600" : "text-light-yellow-1/80"
+                    }`}
+                  >
+                    {roleDisplay}
                   </span>
                 </div>
                 <Button

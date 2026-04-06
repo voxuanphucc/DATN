@@ -74,8 +74,9 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(error);
         }
 
-        // Nếu đang retry và vẫn không có token → không try lại
-        if (originalRequest._retryCount >= 1) {
+        // Nếu đã retry quá nhiều lần → logout
+        const retryCount = originalRequest._retryCount || 0;
+        if (retryCount >= 1) {
           logout();
           window.location.href = '/login';
           return Promise.reject(error);
@@ -91,8 +92,8 @@ axiosInstance.interceptors.response.use(
 
           // Retry original request với token mới
           originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-          originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
-          
+          originalRequest._retryCount = retryCount + 1;
+
           return axiosInstance(originalRequest);
         } else {
           // Response không có tokens → logout
