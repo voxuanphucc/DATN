@@ -42,7 +42,12 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // 401 Unauthorized - Token expired hoặc invalid
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // LOẠI TRỪ: /login và /register không cần refresh token
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                           originalRequest.url?.includes('/auth/register') ||
+                           originalRequest.url?.includes('/auth/verify');
+    
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {

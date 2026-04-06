@@ -18,18 +18,6 @@ const FAILED_ATTEMPTS_LIMIT = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 phút
 const STORAGE_KEY = 'login_attempts';
 
-/**
- * useLogin Hook
- * Xử lý logic đăng nhập (Spec PB02)
- * - Validation form
- * - Track failed login attempts per email
- * - Lock tài khoản sau 5 lần sai trong 15 phút
- * - Lưu user + tokens vào Zustand store
- * - Redirect theo role:
- *   owner    → /dashboard (trang quản lý trang trại)
- *   manager  → /dashboard (bảng điều khiển quản lý)
- *   employee → /tasks (danh sách công việc)
- */
 export function useLogin(): UseLoginReturn {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -126,7 +114,7 @@ export function useLogin(): UseLoginReturn {
             navigate('/dashboard');
           }
         } else {
-          // Fallback to dashboard
+ 
           navigate('/dashboard');
         }
       },

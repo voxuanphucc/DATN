@@ -242,7 +242,6 @@ export function EmailVerificationPage() {
                 )}
                 {errorMessage ? (
                   <>
-                    <Loader2 className="h-12 w-12 animate-spin text-emerald-600 mb-4" />
                     <p style={{ color: '#059669', fontSize: '0.95rem', fontWeight: '500', marginBottom: '1rem' }}>
                       {errorMessage}
                     </p>
