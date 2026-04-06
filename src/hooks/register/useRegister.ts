@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios';
 import { useRegisterMutation } from '../auth/useRegisterMutation';
 import { registerSchema, type RegisterFormValues } from '../../lib/schemas/auth';
+import type { UseRegisterReturn } from '../auth/auth.types';
 
 /**
  * useRegister Hook
@@ -12,7 +12,7 @@ import { registerSchema, type RegisterFormValues } from '../../lib/schemas/auth'
  * - Gọi registerService thông qua useRegisterMutation (React Query)
  * - Hệ thống gửi email xác thực (token 24h)
  */
-export function useRegister() {
+export function useRegister(): UseRegisterReturn {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -61,7 +61,7 @@ export function useRegister() {
               'Đã có lỗi xảy ra. Vui lòng thử lại.';
 
           setServerError(errorMessage);
-          console.error('❌ Lỗi đăng ký:', error);
+          console.error(' Lỗi đăng ký:', error);
         },
       }
     );

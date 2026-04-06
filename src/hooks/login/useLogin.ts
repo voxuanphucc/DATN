@@ -6,6 +6,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useLoginMutation } from '../auth/useLoginMutation';
 import { loginSchema, type LoginFormValues } from '../../lib/schemas/auth';
+import type { UseLoginReturn } from '../auth/auth.types';
 
 interface LoginAttempt {
   email: string;
@@ -28,7 +29,7 @@ const STORAGE_KEY = 'login_attempts';
  *   manager  → /dashboard (bảng điều khiển quản lý)
  *   employee → /tasks (danh sách công việc)
  */
-export function useLogin() {
+export function useLogin(): UseLoginReturn {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
   
