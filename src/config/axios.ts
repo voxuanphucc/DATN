@@ -2,37 +2,18 @@ import axios, { AxiosInstance } from 'axios';
 import { useAuthStore } from '@/store/slices';
 import { refreshTokenService } from '@/services/auth/refresh';
 
-/**
- * ════════════════════════════════════════════════════════════════════════════
- * Axios Instance Configuration
- * ════════════════════════════════════════════════════════════════════════════
- * 
- * Base URL: VITE_API_BASE_URL từ .env hoặc default
- * 
- * Request Interceptor:
- * - Tự động thêm Authorization header với access token
- * 
- * Response Interceptor:
- * - Xử lý 401 Unauthorized → refresh token → retry request
- * - Xử lý 403 Forbidden → redirect to forbidden page
- * - Handle other errors
- */
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 seconds (tăng lên 120000 nếu cần cho Render.com cold start)
+  timeout: 30000, 
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// ─── Request Interceptor ────────────────────────────────────────────────────
-/**
- * Tự động thêm access token vào Authorization header
- * nếu user đã đăng nhập
- */
 axiosInstance.interceptors.request.use(
   (config) => {
     const { accessToken } = useAuthStore.getState();
